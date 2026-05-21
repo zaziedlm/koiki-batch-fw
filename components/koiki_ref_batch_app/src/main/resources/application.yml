@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: koiki-ref-batch-app

@@ -1,0 +1,3 @@
+job:
+  name: customer-a-billing
+  description: Customer A billing batch job
