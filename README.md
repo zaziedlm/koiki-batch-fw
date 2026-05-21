@@ -186,6 +186,14 @@ mvn clean test
 - `tests/integration` / `tests/e2e`
 - OWASP Dependency-Check などの SCA 実行を CI に組み込むこと
 
+## Development Notes
+
+新しい共通機能を追加するときは、まず `docs/batch/platform-capabilities.md` の責務に照らして配置先を決めます。
+
+迷った場合は、業務固有なら `components/koiki_ref_batch_app` または `apps/*`、複数アプリで再利用する横断機能なら `components/libkoiki-batch` に置きます。
+
+設計判断が残るものは `docs/batch/decision-log.md` に追記します。
+
 ## 🔒 Fork・利用に関するご案内
 
 このリポジトリはパブリック公開されていますが、以下の条件を遵守いただける方以外の Fork・再利用はご遠慮ください。
@@ -199,11 +207,3 @@ mvn clean test
 MIT License
 
 https://opensource.org/license/mit
-
-## Development Notes
-
-新しい共通機能を追加するときは、まず `docs/batch/platform-capabilities.md` の責務に照らして配置先を決めます。
-
-迷った場合は、業務固有なら `components/koiki_ref_batch_app` または `apps/*`、複数アプリで再利用する横断機能なら `components/libkoiki-batch` に置きます。
-
-設計判断が残るものは `docs/batch/decision-log.md` に追記します。
