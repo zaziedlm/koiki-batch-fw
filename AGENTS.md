@@ -106,11 +106,13 @@ When adding a feature in one of these areas, update or reference `docs/batch/pla
 
 The default verification command is:
 
-```bash
-mvn clean test
+```powershell
+.\mvnw.cmd clean test
 ```
 
-When using the VS Code Java Extension Pack managed JDK/Maven on Windows, the command may need explicit paths as documented in `README.md`.
+On macOS / Linux, use `./mvnw clean test`.
+
+When using the VS Code Java Extension Pack managed JDK on Windows, `JAVA_HOME` may still need to be set as documented in `README.md`.
 
 For documentation-only changes, Maven execution is optional unless the change affects build instructions, modules, package names, or generated references.
 

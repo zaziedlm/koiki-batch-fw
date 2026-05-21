@@ -8,9 +8,11 @@ The project is still early, so the goal is to keep tests focused and useful whil
 
 The standard repository-level verification command is:
 
-```bash
-mvn clean test
+```powershell
+.\mvnw.cmd clean test
 ```
+
+On macOS / Linux, use `./mvnw clean test`.
 
 Use this when a change affects:
 
@@ -26,13 +28,13 @@ Use this when a change affects:
 
 ## Windows / VS Code Java Extension Pack
 
-When Java and Maven are managed by VS Code Extension Pack for Java Auto Config, the executables may not be on the shell PATH used by an agent.
+Maven Wrapper is checked in, so agents should not need to locate a local Maven installation.
 
-Use explicit paths when needed:
+When Java is managed by VS Code Extension Pack for Java Auto Config and `java` is not on PATH, set `JAVA_HOME` when needed:
 
 ```powershell
 $env:JAVA_HOME="$env:APPDATA\Code\User\globalStorage\pleiades.java-extension-pack-jdk\java\21"
-& "$env:APPDATA\Code\User\globalStorage\pleiades.java-extension-pack-jdk\maven\latest\bin\mvn.cmd" clean test
+.\mvnw.cmd clean test
 ```
 
 If a command fails because Maven cannot access Maven Central, rerun with the appropriate network permission in the current tool environment.
@@ -44,15 +46,15 @@ Use smaller commands when they are enough for the change.
 Examples:
 
 ```bash
-mvn -pl components/libkoiki-batch test
-mvn -pl components/koiki_ref_batch_app test
-mvn -pl apps/customer_a_batch_app test
+./mvnw -pl components/libkoiki-batch test
+./mvnw -pl components/koiki_ref_batch_app test
+./mvnw -pl apps/customer_a_batch_app test
 ```
 
 For changes that touch a dependency used by downstream modules, prefer the full reactor command:
 
 ```bash
-mvn clean test
+./mvnw clean test
 ```
 
 ## Documentation-Only Changes

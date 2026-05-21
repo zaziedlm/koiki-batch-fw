@@ -137,4 +137,4 @@ Before making or accepting a change, ask:
 - Does this introduce a new cross-cutting policy?
 - Should a decision be recorded?
 - Is the implementation heavier than the current project stage needs?
-- Can the change be verified with `mvn clean test` or a smaller command?
+- Can the change be verified with `.\mvnw.cmd clean test` / `./mvnw clean test` or a smaller command?
