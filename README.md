@@ -186,6 +186,20 @@ mvn clean test
 - `tests/integration` / `tests/e2e`
 - OWASP Dependency-Check などの SCA 実行を CI に組み込むこと
 
+## 🔒 Fork・利用に関するご案内
+
+このリポジトリはパブリック公開されていますが、以下の条件を遵守いただける方以外の Fork・再利用はご遠慮ください。
+
+- Fork の前に、必ずリポジトリ管理者（@zaziedlm）にご連絡ください
+
+無断でのForkや再利用が確認された場合、GitHubへの削除申請を行うことがあります。ご理解とご協力をお願いします。
+
+## ライセンス
+
+MIT License
+
+https://opensource.org/license/mit
+
 ## Development Notes
 
 新しい共通機能を追加するときは、まず `docs/batch/platform-capabilities.md` の責務に照らして配置先を決めます。
