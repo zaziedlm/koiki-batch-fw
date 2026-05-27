@@ -8,6 +8,8 @@
 | ステータス | Done（主経路を実装・全テスト通過。FAULT-05 スケジューラ経路は設計のみで実装 deferred） |
 
 > 実装時の確定事項: 主経路の終了コードは `KoikiBatchExitCodeGenerator`（`ApplicationListener<org.springframework.boot.batch.autoconfigure.JobExecutionEvent>` + `org.springframework.boot.ExitCodeGenerator`）が、`JobExecution.getStatus()` と `getAllFailureExceptions()` を `FaultClassifier` で分類して `0/10/20/30` を返す。別途 `ExitStatus` を書き換えるリスナーは設けず、失敗例外を直接読む方式に簡素化した。`JobExecution` は `org.springframework.batch.core.job`、`ExitStatus`/`BatchStatus` は `org.springframework.batch.core`。
+>
+> E2E 点検での追加（2026-05-27）: 起動前例外（`InvalidJobParametersException` 等、`JobExecution` 生成前 throw で `JobExecutionEvent` が出ないケース）は主経路で拾えず Boot 既定 exit 1 になる。これを補う **`KoikiExitCodeExceptionMapper`**（Spring Boot `ExitCodeExceptionMapper`）を追加。`InvalidJobParametersException`→20、それ以外は `FaultClassifier` 準拠（未分類→30）。core で exit-code 有効時に自動登録。FAULT-05（スケジューラ経路）は引き続き deferred。
 
 共通の準拠事項は [ロードマップの準拠仕様](../plans/00-libkoiki-batch-roadmap.md) に従う。終了コードは [return-code-mapping.md](../../ops/jp1/jobs/return-code-mapping.md) の `0/10/20/30` を正とする。非推奨 API（`CommandLineJobRunner`）は使わない。
 

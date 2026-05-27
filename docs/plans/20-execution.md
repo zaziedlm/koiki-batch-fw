@@ -43,9 +43,9 @@
 
 ### 4. `ConcurrencyGuardService` の実体化
 
-- インターフェース（`ConcurrencyGuardService`）+ デフォルト実装（`JobRepositoryConcurrencyGuardService`）に再設計。`acquire(jobName)` の意味を「同名ジョブの多重起動を検出して可否を返す」に定義。
-- v0.1.0 デフォルト実装: `JobRepository.findRunningJobExecutions(String)` で対象ジョブ名の実行中 execution を問い合わせ、実行中があれば取得不可とする（インメモリ簡易ロックではなく JobRepository の実行状態を正とする。`JobOperator.getRunningExecutions` は 6.0 で非推奨のため不使用）。
-- 取得不可時の扱い（即時失敗 / 終了コード）は fault と連携。
+- インターフェース（`ConcurrencyGuardService#canRun(JobExecution)`）+ デフォルト実装（`JobRepositoryConcurrencyGuardService`）。`canRun` は「**自分以外**の同名ジョブ実行が走っていないか」を返す（`beforeJob` 時点では自実行が既に running に数えられるため自分を除外する）。
+- v0.1.0 デフォルト実装: `JobRepository.findRunningJobExecutions(String)` で対象ジョブ名の実行中 execution を問い合わせ、自実行 ID を除いて他に running があれば不可とする（`JobOperator.getRunningExecutions` は 6.0 で非推奨のため不使用）。
+- **実効化**: `ConcurrencyGuardJobListener`（`JobExecutionListener`）が `beforeJob` で `canRun` を呼び、不可なら `SystemException` で失敗させる（→ 終了コード 30）。ジョブはこのリスナーを opt-in（`JobBuilder.listener(...)`）で適用する（バリデータの適用方法と同様）。
 - deferred: 分散環境での DB ロック・排他制御は本 Phase では実装しない（単一プロセス前提の検出のみ）。
 
 ## 検証

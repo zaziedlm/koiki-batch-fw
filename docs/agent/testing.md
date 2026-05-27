@@ -24,6 +24,8 @@ Use this when a change affects:
 
 `clean` matters because stale `target/` classes can hide package or dependency problems.
 
+`mvn clean test` runs unit tests only (Surefire). Integration tests follow the `*IT` naming convention and run under the Maven Failsafe plugin during `mvn verify`. Use `mvn verify` to run the job/exit-code integration tests in `koiki_ref_batch_app` (for example `BatchCoreWiringIT`, `CustomerDailySyncJobIT`, `ExitCodeE2EIT`).
+
 ## Windows / VS Code Java Extension Pack
 
 When Java and Maven are managed by VS Code Extension Pack for Java Auto Config, the executables may not be on the shell PATH used by an agent.

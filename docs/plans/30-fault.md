@@ -59,6 +59,8 @@
 - v0.1.0 の既定: 参照アプリが Spring Boot 起動のため**主経路を既定**とする。スケジューラ経路は JP1 ランチャ実装ラウンドで具体化する。
 - いずれの経路でも `return-code-mapping.md` の `0/10/20/30` と一致させる。
 
+**起動前例外（パラメータ検証失敗等）の終了コード**: 検証は `JobExecution` 生成前に throw するため `JobExecutionEvent` が出ず、主経路の generator では拾えない（Boot 既定では exit 1）。これを補うため `KoikiExitCodeExceptionMapper`（Spring Boot `ExitCodeExceptionMapper`）を追加し、`InvalidJobParametersException`→`20`（入力エラー）、それ以外は `FaultClassifier` 準拠（未分類→`30`）に写像する。core で exit-code 有効時に自動登録。
+
 ## 検証
 
 - `DefaultFaultClassifier` の単体テスト（業務/システム/未分類）。

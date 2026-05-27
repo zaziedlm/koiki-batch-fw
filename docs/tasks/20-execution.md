@@ -8,6 +8,8 @@
 | ステータス | Done（Spring Batch 6.0.3 で実装・全テスト通過） |
 
 > 実装時の確定事項: 多重起動検出は `JobRepository.findRunningJobExecutions(String):Set<JobExecution>` を使用（`JobOperator.getRunningExecutions(String)` は 6.0 で非推奨/removal 予定のため不使用）。デフォルト実装クラス名は `JobRepositoryConcurrencyGuardService`。`JobParametersValidator.validate` は SB6 で `InvalidJobParametersException`（旧 `JobParametersInvalidException` から改名）を送出。
+>
+> E2E 点検での精緻化（2026-05-27）: ガードは `acquire(String)` から **`canRun(JobExecution)`** に変更（`beforeJob` 時点で自実行が running に数えられるため自分を除外）。実効化のため `ConcurrencyGuardJobListener`（`JobExecutionListener`）を追加し、不可時は `SystemException`→終了コード 30。ジョブは `JobBuilder.listener(...)` で opt-in。参照ジョブ `customer-daily-sync` に結線済み。
 
 共通の準拠事項は [ロードマップの準拠仕様](../plans/00-libkoiki-batch-roadmap.md) に従う。非推奨 API（`JobExplorer` / `JobLauncher`）は使わない。
 
