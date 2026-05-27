@@ -1,3 +1,10 @@
 spring:
   application:
     name: koiki-ref-batch-app
+  batch:
+    job:
+      name: customer-daily-sync
+
+logging:
+  level:
+    "[org.koikifw]": INFO
