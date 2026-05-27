@@ -1,5 +1,7 @@
 package org.koikifw.libkoiki.batch.execution;
 
+import org.springframework.batch.core.job.JobExecution;
+
 /**
  * Guards against concurrent execution of the same job.
  *
@@ -9,10 +11,11 @@ package org.koikifw.libkoiki.batch.execution;
 public interface ConcurrencyGuardService {
 
     /**
-     * Attempts to acquire the right to run the given job.
+     * Whether the given execution is allowed to run.
      *
-     * @param jobName the job name to guard
-     * @return {@code true} if no execution of the job is currently running
+     * @param execution the execution about to start
+     * @return {@code true} if no <em>other</em> execution of the same job is
+     *         currently running (the given execution is excluded from the check)
      */
-    boolean acquire(String jobName);
+    boolean canRun(JobExecution execution);
 }

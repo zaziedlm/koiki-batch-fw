@@ -19,8 +19,10 @@ public class JobRepositoryConcurrencyGuardService implements ConcurrencyGuardSer
     }
 
     @Override
-    public boolean acquire(String jobName) {
-        java.util.Set<JobExecution> running = jobRepository.findRunningJobExecutions(jobName);
-        return running.isEmpty();
+    public boolean canRun(JobExecution execution) {
+        String jobName = execution.getJobInstance().getJobName();
+        long currentId = execution.getId();
+        return jobRepository.findRunningJobExecutions(jobName).stream()
+                .allMatch(running -> running.getId() == currentId);
     }
 }

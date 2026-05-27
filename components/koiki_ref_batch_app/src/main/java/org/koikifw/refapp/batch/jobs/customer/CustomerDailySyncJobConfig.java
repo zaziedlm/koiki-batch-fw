@@ -1,5 +1,6 @@
 package org.koikifw.refapp.batch.jobs.customer;
 
+import org.koikifw.libkoiki.batch.execution.ConcurrencyGuardJobListener;
 import org.koikifw.libkoiki.batch.execution.JobParametersAccessor;
 import org.koikifw.libkoiki.batch.execution.KoikiJobParametersValidator;
 import org.slf4j.Logger;
@@ -47,9 +48,11 @@ public class CustomerDailySyncJobConfig {
 
     @Bean
     public Job customerDailySyncJob(JobRepository jobRepository, Step customerDailySyncStep,
-            KoikiJobParametersValidator koikiJobParametersValidator) {
+            KoikiJobParametersValidator koikiJobParametersValidator,
+            ConcurrencyGuardJobListener concurrencyGuardJobListener) {
         return new JobBuilder(JOB_NAME, jobRepository)
                 .validator(koikiJobParametersValidator)
+                .listener(concurrencyGuardJobListener)
                 .start(customerDailySyncStep)
                 .build();
     }

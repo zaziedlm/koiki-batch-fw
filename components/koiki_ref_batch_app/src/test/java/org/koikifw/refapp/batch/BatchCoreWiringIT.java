@@ -3,10 +3,12 @@ package org.koikifw.refapp.batch;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.koikifw.libkoiki.batch.core.KoikiBatchProperties;
+import org.koikifw.libkoiki.batch.execution.ConcurrencyGuardJobListener;
 import org.koikifw.libkoiki.batch.execution.ConcurrencyGuardService;
 import org.koikifw.libkoiki.batch.execution.KoikiJobParametersValidator;
 import org.koikifw.libkoiki.batch.fault.FaultClassifier;
 import org.koikifw.libkoiki.batch.fault.KoikiBatchExitCodeGenerator;
+import org.koikifw.libkoiki.batch.fault.KoikiExitCodeExceptionMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,7 +33,13 @@ class BatchCoreWiringIT {
     private KoikiBatchExitCodeGenerator exitCodeGenerator;
 
     @Autowired
+    private KoikiExitCodeExceptionMapper exitCodeExceptionMapper;
+
+    @Autowired
     private ConcurrencyGuardService concurrencyGuardService;
+
+    @Autowired
+    private ConcurrencyGuardJobListener concurrencyGuardJobListener;
 
     @Test
     void frameworkBeansAreWired() {
@@ -39,6 +47,8 @@ class BatchCoreWiringIT {
         assertThat(jobParametersValidator).isNotNull();
         assertThat(faultClassifier).isNotNull();
         assertThat(exitCodeGenerator).isNotNull();
+        assertThat(exitCodeExceptionMapper).isNotNull();
         assertThat(concurrencyGuardService).isNotNull();
+        assertThat(concurrencyGuardJobListener).isNotNull();
     }
 }

@@ -1,11 +1,13 @@
 package org.koikifw.libkoiki.batch.core;
 
+import org.koikifw.libkoiki.batch.execution.ConcurrencyGuardJobListener;
 import org.koikifw.libkoiki.batch.execution.ConcurrencyGuardService;
 import org.koikifw.libkoiki.batch.execution.JobRepositoryConcurrencyGuardService;
 import org.koikifw.libkoiki.batch.execution.KoikiJobParametersValidator;
 import org.koikifw.libkoiki.batch.fault.DefaultFaultClassifier;
 import org.koikifw.libkoiki.batch.fault.FaultClassifier;
 import org.koikifw.libkoiki.batch.fault.KoikiBatchExitCodeGenerator;
+import org.koikifw.libkoiki.batch.fault.KoikiExitCodeExceptionMapper;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -49,10 +51,25 @@ public class BatchCoreAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(prefix = "koiki.batch.exit-code", name = "enabled", matchIfMissing = true)
+    public KoikiExitCodeExceptionMapper koikiExitCodeExceptionMapper(FaultClassifier faultClassifier) {
+        return new KoikiExitCodeExceptionMapper(faultClassifier);
+    }
+
+    @Bean
     @ConditionalOnBean(JobRepository.class)
     @ConditionalOnMissingBean
     @ConditionalOnProperty(prefix = "koiki.batch.concurrency-guard", name = "enabled", matchIfMissing = true)
     public ConcurrencyGuardService concurrencyGuardService(JobRepository jobRepository) {
         return new JobRepositoryConcurrencyGuardService(jobRepository);
+    }
+
+    @Bean
+    @ConditionalOnBean(ConcurrencyGuardService.class)
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(prefix = "koiki.batch.concurrency-guard", name = "enabled", matchIfMissing = true)
+    public ConcurrencyGuardJobListener concurrencyGuardJobListener(ConcurrencyGuardService concurrencyGuardService) {
+        return new ConcurrencyGuardJobListener(concurrencyGuardService);
     }
 }
