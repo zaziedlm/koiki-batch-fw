@@ -5,6 +5,8 @@ import static org.mockito.Mockito.mock;
 
 import org.koikifw.libkoiki.batch.execution.ConcurrencyGuardService;
 import org.koikifw.libkoiki.batch.execution.KoikiJobParametersValidator;
+import org.koikifw.libkoiki.batch.audit.AuditEventPublisher;
+import org.koikifw.libkoiki.batch.audit.LoggingAuditEventPublisher;
 import org.koikifw.libkoiki.batch.fault.FaultClassifier;
 import org.koikifw.libkoiki.batch.fault.KoikiBatchExitCodeGenerator;
 import org.koikifw.libkoiki.batch.observability.JobLogListener;
@@ -28,6 +30,9 @@ class BatchCoreAutoConfigurationTest {
             assertThat(context).hasSingleBean(KoikiBatchExitCodeGenerator.class);
             assertThat(context).hasSingleBean(JobLogListener.class);
             assertThat(context).hasSingleBean(StepLogListener.class);
+            assertThat(context).hasSingleBean(AuditEventPublisher.class);
+            assertThat(context.getBean(AuditEventPublisher.class))
+                    .isInstanceOf(LoggingAuditEventPublisher.class);
         });
     }
 
@@ -38,6 +43,12 @@ class BatchCoreAutoConfigurationTest {
                     assertThat(context).doesNotHaveBean(JobLogListener.class);
                     assertThat(context).doesNotHaveBean(StepLogListener.class);
                 });
+    }
+
+    @Test
+    void auditPublisherCanBeDisabled() {
+        runner.withPropertyValues("koiki.batch.audit.enabled=false")
+                .run(context -> assertThat(context).doesNotHaveBean(AuditEventPublisher.class));
     }
 
     @Test
