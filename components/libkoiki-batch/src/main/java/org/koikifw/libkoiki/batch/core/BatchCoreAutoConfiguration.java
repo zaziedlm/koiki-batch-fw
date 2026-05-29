@@ -8,6 +8,8 @@ import org.koikifw.libkoiki.batch.fault.DefaultFaultClassifier;
 import org.koikifw.libkoiki.batch.fault.FaultClassifier;
 import org.koikifw.libkoiki.batch.fault.KoikiBatchExitCodeGenerator;
 import org.koikifw.libkoiki.batch.fault.KoikiExitCodeExceptionMapper;
+import org.koikifw.libkoiki.batch.observability.JobLogListener;
+import org.koikifw.libkoiki.batch.observability.StepLogListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -71,5 +73,19 @@ public class BatchCoreAutoConfiguration {
     @ConditionalOnProperty(prefix = "koiki.batch.concurrency-guard", name = "enabled", matchIfMissing = true)
     public ConcurrencyGuardJobListener concurrencyGuardJobListener(ConcurrencyGuardService concurrencyGuardService) {
         return new ConcurrencyGuardJobListener(concurrencyGuardService);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(prefix = "koiki.batch.logging.correlation", name = "enabled", matchIfMissing = true)
+    public JobLogListener jobLogListener() {
+        return new JobLogListener();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(prefix = "koiki.batch.logging.correlation", name = "enabled", matchIfMissing = true)
+    public StepLogListener stepLogListener() {
+        return new StepLogListener();
     }
 }

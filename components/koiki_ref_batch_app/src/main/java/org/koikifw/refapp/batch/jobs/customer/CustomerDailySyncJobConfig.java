@@ -3,6 +3,8 @@ package org.koikifw.refapp.batch.jobs.customer;
 import org.koikifw.libkoiki.batch.execution.ConcurrencyGuardJobListener;
 import org.koikifw.libkoiki.batch.execution.JobParametersAccessor;
 import org.koikifw.libkoiki.batch.execution.KoikiJobParametersValidator;
+import org.koikifw.libkoiki.batch.observability.JobLogListener;
+import org.koikifw.libkoiki.batch.observability.StepLogListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.job.Job;
@@ -40,19 +42,22 @@ public class CustomerDailySyncJobConfig {
 
     @Bean
     public Step customerDailySyncStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
-            Tasklet customerDailySyncTasklet) {
+            Tasklet customerDailySyncTasklet, StepLogListener stepLogListener) {
         return new StepBuilder("customer-daily-sync-step", jobRepository)
                 .tasklet(customerDailySyncTasklet, transactionManager)
+                .listener(stepLogListener)
                 .build();
     }
 
     @Bean
     public Job customerDailySyncJob(JobRepository jobRepository, Step customerDailySyncStep,
             KoikiJobParametersValidator koikiJobParametersValidator,
-            ConcurrencyGuardJobListener concurrencyGuardJobListener) {
+            ConcurrencyGuardJobListener concurrencyGuardJobListener,
+            JobLogListener jobLogListener) {
         return new JobBuilder(JOB_NAME, jobRepository)
                 .validator(koikiJobParametersValidator)
                 .listener(concurrencyGuardJobListener)
+                .listener(jobLogListener)
                 .start(customerDailySyncStep)
                 .build();
     }

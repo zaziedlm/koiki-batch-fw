@@ -8,3 +8,7 @@ spring:
 logging:
   level:
     "[org.koikifw]": INFO
+  # MDC correlation populated by the libkoiki-batch JobLogListener / StepLogListener.
+  # Spring Boot inserts this pattern into the default console/file format.
+  pattern:
+    correlation: "[%X{koiki.job.name:-} %X{koiki.job.execId:-} %X{koiki.step.name:-}] "
