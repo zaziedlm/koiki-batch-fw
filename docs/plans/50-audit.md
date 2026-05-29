@@ -119,3 +119,7 @@ public interface AuditEventPublisher {
 - **Spring Batch のジョブ完了イベントからの自動発行**: 業務粒度と合わないため取らない。将来「ジョブ完了監査」のような汎用イベントを足す場合は別途検討。
 - **マスキング**: Phase 3 security で扱う。本フェーズは「PII を `attributes` に入れない」運用ガイドのみ。
 - **複数 Publisher の合成**（例: ログ＋DB を同時発行）: 明示的に複数 bean を束ねる仕組みは未提供。必要になったときに `CompositeAuditEventPublisher` 等を追加。
+
+## 運用ノート
+
+- **Logback ロガー継承（appender additivity）**: 既定では `org.koikifw.audit` への出力は親ロガー `org.koikifw` の appender にも伝播する。監査を**完全に独立したファイル／宛先**に分離したい場合、アプリの `logback-spring.xml` で audit 専用 appender を定義し、当該ロガーで `<logger name="org.koikifw.audit" additivity="false">` を設定する。framework 側では additivity を強制しない（アプリ要件で選択）。
