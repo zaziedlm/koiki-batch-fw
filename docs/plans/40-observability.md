@@ -102,3 +102,5 @@ logging:
 - JSON 構造化ログ（logstash-logback-encoder 等）→ アプリ選択肢で扱い、フレームワークは強制しない。
 - 全 Job への listener 自動適用（現状は opt-in）。
 - マスキング・PII 抽象（Phase 3 security で扱う。今フェーズは「MDC に PII を載せない」運用ガイドのみ）。
+- **並列ステップでの MDC 伝播は未対応**: SLF4J MDC はスレッドローカルのため、`TaskExecutor` 並列やパーティション分割でワーカースレッドへは自動継承されない。同期 tasklet 前提の Phase 1 ではスコープ外。並列対応が必要になった時点で MDC 伝播戦略（`TaskDecorator` 等）を別ラウンドで設計する。
+- **MDC キーの所有権**: フレームワークは `CorrelationKeys` の MDC キーを**自身が所有する**前提で `afterJob`/`afterStep` で無条件に `remove` する。呼び出し元が同名キーを事前に設定していた場合、その値もジョブ終了時に消える（バッチ＝1 JVM 1 ジョブの前提では実害なし）。共有スレッドプール経由でリスナーを再利用する用途が出てきた場合は「保存→復元」戦略へ要再設計。
