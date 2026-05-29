@@ -14,6 +14,8 @@ public class KoikiBatchProperties {
 
     private final Logging logging = new Logging();
 
+    private final Audit audit = new Audit();
+
     public ConcurrencyGuard getConcurrencyGuard() {
         return concurrencyGuard;
     }
@@ -24,6 +26,10 @@ public class KoikiBatchProperties {
 
     public Logging getLogging() {
         return logging;
+    }
+
+    public Audit getAudit() {
+        return audit;
     }
 
     /** Concurrency guard against multiple running executions of the same job. */
@@ -42,6 +48,20 @@ public class KoikiBatchProperties {
 
     /** Mapping of batch outcomes to KOIKI process exit codes. */
     public static class ExitCode {
+
+        private boolean enabled = true;
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+    }
+
+    /** Audit event publication. */
+    public static class Audit {
 
         private boolean enabled = true;
 

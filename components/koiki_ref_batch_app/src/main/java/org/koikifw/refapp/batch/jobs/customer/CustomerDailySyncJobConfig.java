@@ -1,5 +1,7 @@
 package org.koikifw.refapp.batch.jobs.customer;
 
+import org.koikifw.libkoiki.batch.audit.AuditEventBuilder;
+import org.koikifw.libkoiki.batch.audit.AuditEventPublisher;
 import org.koikifw.libkoiki.batch.execution.ConcurrencyGuardJobListener;
 import org.koikifw.libkoiki.batch.execution.JobParametersAccessor;
 import org.koikifw.libkoiki.batch.execution.KoikiJobParametersValidator;
@@ -31,11 +33,19 @@ public class CustomerDailySyncJobConfig {
     public static final String JOB_NAME = "customer-daily-sync";
 
     @Bean
-    public Tasklet customerDailySyncTasklet() {
+    public Tasklet customerDailySyncTasklet(AuditEventPublisher auditEventPublisher) {
         return (contribution, chunkContext) -> {
-            JobParameters parameters = contribution.getStepExecution().getJobExecution().getJobParameters();
+            var jobExecution = contribution.getStepExecution().getJobExecution();
+            JobParameters parameters = jobExecution.getJobParameters();
             JobParametersAccessor accessor = new JobParametersAccessor(parameters);
             log.info("{} running: bizDate={}, requestId={}", JOB_NAME, accessor.bizDate(), accessor.requestId());
+
+            auditEventPublisher.publish(AuditEventBuilder.builder()
+                    .eventType("CUSTOMER_DAILY_SYNC_COMPLETED")
+                    .message("customer-daily-sync completed")
+                    .context(jobExecution)
+                    .build());
+
             return RepeatStatus.FINISHED;
         };
     }

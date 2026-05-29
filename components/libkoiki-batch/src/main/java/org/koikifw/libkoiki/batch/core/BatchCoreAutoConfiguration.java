@@ -1,5 +1,7 @@
 package org.koikifw.libkoiki.batch.core;
 
+import org.koikifw.libkoiki.batch.audit.AuditEventPublisher;
+import org.koikifw.libkoiki.batch.audit.LoggingAuditEventPublisher;
 import org.koikifw.libkoiki.batch.execution.ConcurrencyGuardJobListener;
 import org.koikifw.libkoiki.batch.execution.ConcurrencyGuardService;
 import org.koikifw.libkoiki.batch.execution.JobRepositoryConcurrencyGuardService;
@@ -87,5 +89,12 @@ public class BatchCoreAutoConfiguration {
     @ConditionalOnProperty(prefix = "koiki.batch.logging.correlation", name = "enabled", matchIfMissing = true)
     public StepLogListener stepLogListener() {
         return new StepLogListener();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(prefix = "koiki.batch.audit", name = "enabled", matchIfMissing = true)
+    public AuditEventPublisher auditEventPublisher() {
+        return new LoggingAuditEventPublisher();
     }
 }
