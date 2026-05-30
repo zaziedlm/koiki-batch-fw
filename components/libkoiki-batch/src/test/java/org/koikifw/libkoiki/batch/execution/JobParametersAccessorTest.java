@@ -35,4 +35,15 @@ class JobParametersAccessorTest {
         assertThatThrownBy(() -> new JobParametersAccessor(params).bizDate())
                 .isInstanceOf(IllegalStateException.class);
     }
+
+    @Test
+    void failsOnImpossibleCalendarBizDate() {
+        JobParameters params = new JobParametersBuilder()
+                .addString(StandardJobParameters.BIZ_DATE, "20260230")
+                .toJobParameters();
+
+        assertThatThrownBy(() -> new JobParametersAccessor(params).bizDate())
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(StandardJobParameters.BIZ_DATE);
+    }
 }

@@ -43,4 +43,14 @@ class KoikiJobParametersValidatorTest {
                 .isInstanceOf(InvalidJobParametersException.class)
                 .hasMessageContaining(StandardJobParameters.BIZ_DATE);
     }
+
+    @Test
+    void rejectsBizDateWithValidFormatButImpossibleCalendarDate() {
+        JobParameters params = valid()
+                .addString(StandardJobParameters.BIZ_DATE, "20260230")
+                .toJobParameters();
+        assertThatThrownBy(() -> validator.validate(params))
+                .isInstanceOf(InvalidJobParametersException.class)
+                .hasMessageContaining(StandardJobParameters.BIZ_DATE);
+    }
 }
