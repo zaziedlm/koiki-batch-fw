@@ -2,13 +2,17 @@ package org.koikifw.libkoiki.batch.io;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.koikifw.libkoiki.batch.fault.SystemException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.batch.core.BatchStatus;
@@ -43,11 +47,13 @@ class AtomicOutputTest {
     }
 
     @Test
-    void promoteWithMissingTempIsNoOp() {
+    void promoteWithMissingTempFailsFast() {
         Path finalPath = tmp.resolve("result.csv");
         Path temp = AtomicFileOutput.tempPath(finalPath, ".inprogress");
 
-        assertThatCode(() -> AtomicFileOutput.promote(temp, finalPath)).doesNotThrowAnyException();
+        assertThatThrownBy(() -> AtomicFileOutput.promote(temp, finalPath))
+                .isInstanceOf(SystemException.class)
+                .hasMessageContaining("In-progress output file does not exist");
         assertThat(finalPath).doesNotExist();
     }
 
@@ -104,5 +110,16 @@ class AtomicOutputTest {
     void listenerNoOpWithoutOutputParameter() {
         assertThatCode(() -> new AtomicOutputListener(".inprogress")
                 .afterJob(execution(BatchStatus.COMPLETED, null))).doesNotThrowAnyException();
+    }
+
+    @Test
+    void listenerMarksExecutionFailedWhenPromotionFails() {
+        Path finalPath = tmp.resolve("out.csv");
+        JobExecution execution = execution(BatchStatus.COMPLETED, finalPath.toString());
+
+        assertThatThrownBy(() -> new AtomicOutputListener(".inprogress").afterJob(execution))
+                .isInstanceOf(SystemException.class);
+        verify(execution).setStatus(BatchStatus.FAILED);
+        verify(execution).addFailureException(any(SystemException.class));
     }
 }

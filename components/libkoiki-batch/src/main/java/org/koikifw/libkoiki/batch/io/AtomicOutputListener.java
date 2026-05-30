@@ -2,6 +2,7 @@ package org.koikifw.libkoiki.batch.io;
 
 import java.nio.file.Path;
 
+import org.koikifw.libkoiki.batch.fault.SystemException;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
@@ -40,7 +41,13 @@ public class AtomicOutputListener implements JobExecutionListener {
         Path finalPath = Path.of(outputFile);
         Path temp = AtomicFileOutput.tempPath(finalPath, tempSuffix);
         if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
-            AtomicFileOutput.promote(temp, finalPath);
+            try {
+                AtomicFileOutput.promote(temp, finalPath);
+            } catch (SystemException ex) {
+                jobExecution.setStatus(BatchStatus.FAILED);
+                jobExecution.addFailureException(ex);
+                throw ex;
+            }
         } else {
             AtomicFileOutput.discard(temp);
         }
