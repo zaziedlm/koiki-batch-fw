@@ -11,7 +11,15 @@ Official framework, reference, and repository-owned customer sample packages use
 - Shared framework: `org.koikifw.libkoiki.batch.*`
 - Reference app: `org.koikifw.refapp.batch.*`
 - Repository-owned customer sample apps: `org.koikifw.customer.<customer-id>.batch.*`
-- Real downstream customer apps outside this repository may use customer-owned roots, but that decision must be explicit.
+- Real downstream customer apps outside this repository may use customer-owned roots, such as `jp.co.customer.example.batch.*` or `com.customer.example.batch.*`, but that decision must be explicit.
+
+`org.koikifw.customer.<customer-id>.batch.*` is a convention for repository-owned sample customer apps only. It is not a technical requirement for real customer systems.
+
+`libkoiki-batch` must remain independent of downstream package roots. A customer app may live outside `org.koikifw.*` when:
+
+- it has a dependency on `libkoiki-batch`
+- its Spring Boot application/component scan includes its own job configuration
+- it does not depend on `koiki-ref-batch-app` for production job implementations
 
 Do not introduce a new root package without recording the decision.
 

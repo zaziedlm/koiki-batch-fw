@@ -42,7 +42,14 @@ Repository-owned customer sample apps should use:
 org.koikifw.customer.<customer-id>.batch.*
 ```
 
-Real downstream customer apps outside this repository may use customer-owned roots when that decision is explicit.
+Real downstream customer apps outside this repository may use customer-owned roots when that decision is explicit, for example:
+
+```text
+jp.co.customer.example.batch.*
+com.customer.example.batch.*
+```
+
+`libkoiki-batch` must not depend on customer application package roots. A customer app works outside `org.koikifw.*` as long as it depends on `libkoiki-batch` and its own Spring Boot component scan includes its job configuration.
 
 Do not introduce a new package root without updating the relevant documentation and explaining the reason.
 
