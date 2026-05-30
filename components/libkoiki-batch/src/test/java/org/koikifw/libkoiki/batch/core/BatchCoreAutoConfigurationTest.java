@@ -9,6 +9,9 @@ import org.koikifw.libkoiki.batch.audit.AuditEventPublisher;
 import org.koikifw.libkoiki.batch.audit.LoggingAuditEventPublisher;
 import org.koikifw.libkoiki.batch.fault.FaultClassifier;
 import org.koikifw.libkoiki.batch.fault.KoikiBatchExitCodeGenerator;
+import org.koikifw.libkoiki.batch.io.AtomicOutputListener;
+import org.koikifw.libkoiki.batch.io.FileArchivePolicy;
+import org.koikifw.libkoiki.batch.io.FileIngestionLifecycleListener;
 import org.koikifw.libkoiki.batch.observability.JobLogListener;
 import org.koikifw.libkoiki.batch.observability.StepLogListener;
 import org.koikifw.libkoiki.batch.security.Masker;
@@ -35,7 +38,20 @@ class BatchCoreAutoConfigurationTest {
             assertThat(context.getBean(AuditEventPublisher.class))
                     .isInstanceOf(LoggingAuditEventPublisher.class);
             assertThat(context).hasSingleBean(Masker.class);
+            assertThat(context).hasSingleBean(FileArchivePolicy.class);
+            assertThat(context).hasSingleBean(FileIngestionLifecycleListener.class);
+            assertThat(context).hasSingleBean(AtomicOutputListener.class);
         });
+    }
+
+    @Test
+    void ioFileCharsetDefaultsToMs932AndBinds() {
+        runner.run(context ->
+                assertThat(context.getBean(KoikiBatchProperties.class).getIo().getFile().getCharset())
+                        .isEqualTo("MS932"));
+        runner.withPropertyValues("koiki.batch.io.file.charset=UTF-8")
+                .run(context -> assertThat(context.getBean(KoikiBatchProperties.class)
+                        .getIo().getFile().getCharset()).isEqualTo("UTF-8"));
     }
 
     @Test

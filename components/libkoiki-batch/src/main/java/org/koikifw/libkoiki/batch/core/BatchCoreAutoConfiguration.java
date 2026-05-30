@@ -10,6 +10,10 @@ import org.koikifw.libkoiki.batch.fault.DefaultFaultClassifier;
 import org.koikifw.libkoiki.batch.fault.FaultClassifier;
 import org.koikifw.libkoiki.batch.fault.KoikiBatchExitCodeGenerator;
 import org.koikifw.libkoiki.batch.fault.KoikiExitCodeExceptionMapper;
+import org.koikifw.libkoiki.batch.io.AtomicOutputListener;
+import org.koikifw.libkoiki.batch.io.DirectoryFileArchivePolicy;
+import org.koikifw.libkoiki.batch.io.FileArchivePolicy;
+import org.koikifw.libkoiki.batch.io.FileIngestionLifecycleListener;
 import org.koikifw.libkoiki.batch.observability.JobLogListener;
 import org.koikifw.libkoiki.batch.observability.StepLogListener;
 import org.koikifw.libkoiki.batch.security.Masker;
@@ -108,5 +112,25 @@ public class BatchCoreAutoConfiguration {
         return new LoggingAuditEventPublisher(
                 masker.getIfAvailable(),
                 properties.getSecurity().getMasking().getSensitiveKeys());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public FileArchivePolicy fileArchivePolicy(KoikiBatchProperties properties) {
+        KoikiBatchProperties.Io.File file = properties.getIo().getFile();
+        return new DirectoryFileArchivePolicy(file.getArchiveDir(), file.getErrorDir());
+    }
+
+    @Bean
+    @ConditionalOnBean(FileArchivePolicy.class)
+    @ConditionalOnMissingBean
+    public FileIngestionLifecycleListener fileIngestionLifecycleListener(FileArchivePolicy fileArchivePolicy) {
+        return new FileIngestionLifecycleListener(fileArchivePolicy);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public AtomicOutputListener atomicOutputListener(KoikiBatchProperties properties) {
+        return new AtomicOutputListener(properties.getIo().getFile().getTempSuffix());
     }
 }

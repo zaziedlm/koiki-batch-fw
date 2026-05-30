@@ -23,6 +23,8 @@ public class KoikiBatchProperties {
 
     private final Transaction transaction = new Transaction();
 
+    private final Io io = new Io();
+
     public ConcurrencyGuard getConcurrencyGuard() {
         return concurrencyGuard;
     }
@@ -45,6 +47,10 @@ public class KoikiBatchProperties {
 
     public Transaction getTransaction() {
         return transaction;
+    }
+
+    public Io getIo() {
+        return io;
     }
 
     /** Concurrency guard against multiple running executions of the same job. */
@@ -129,6 +135,68 @@ public class KoikiBatchProperties {
 
             public void setSensitiveKeys(Set<String> sensitiveKeys) {
                 this.sensitiveKeys = sensitiveKeys;
+            }
+        }
+    }
+
+    /**
+     * File I/O support: ingestion/output charset, archive/error directories, and
+     * the atomic-output temp suffix. These are independent, opt-in helpers; a job
+     * uses only what applies to it (see {@code docs/batch/...80-io-support}).
+     */
+    public static class Io {
+
+        private final File file = new File();
+
+        public File getFile() {
+            return file;
+        }
+
+        /** Flat-file I/O settings. */
+        public static class File {
+
+            /** Charset for reading/writing files; switchable per environment. */
+            private String charset = "MS932";
+
+            /** Directory to move input files to on success; empty = no archiving. */
+            private String archiveDir = "";
+
+            /** Directory to move input files to on failure; empty = no move. */
+            private String errorDir = "";
+
+            /** Suffix for the in-progress temp file used by atomic output. */
+            private String tempSuffix = ".inprogress";
+
+            public String getCharset() {
+                return charset;
+            }
+
+            public void setCharset(String charset) {
+                this.charset = charset;
+            }
+
+            public String getArchiveDir() {
+                return archiveDir;
+            }
+
+            public void setArchiveDir(String archiveDir) {
+                this.archiveDir = archiveDir;
+            }
+
+            public String getErrorDir() {
+                return errorDir;
+            }
+
+            public void setErrorDir(String errorDir) {
+                this.errorDir = errorDir;
+            }
+
+            public String getTempSuffix() {
+                return tempSuffix;
+            }
+
+            public void setTempSuffix(String tempSuffix) {
+                this.tempSuffix = tempSuffix;
             }
         }
     }
