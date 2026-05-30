@@ -1,0 +1,6 @@
+# Overrides for the `jdbc-repository` profile: an isolated in-memory database so the
+# JDBC JobRepository's BATCH_* metadata does not interfere with the resourceless
+# (default-profile) contexts that share the JVM during tests.
+spring:
+  datasource:
+    url: jdbc:h2:mem:refappdb_jdbc;DB_CLOSE_DELAY=-1

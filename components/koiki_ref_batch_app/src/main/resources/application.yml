@@ -1,7 +1,19 @@
 spring:
   application:
     name: koiki-ref-batch-app
+  # Single shared in-memory DataSource for both batch metadata and business data,
+  # so each chunk commit writes business rows and step metadata atomically.
+  datasource:
+    url: jdbc:h2:mem:refappdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  # Flyway owns all schema (business tables + BATCH_* metadata); batch auto-init is off.
+  flyway:
+    locations: classpath:db/migration/refapp
   batch:
+    jdbc:
+      initialize-schema: never
     job:
       name: customer-daily-sync
 

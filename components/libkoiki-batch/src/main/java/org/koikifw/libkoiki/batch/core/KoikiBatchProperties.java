@@ -21,6 +21,8 @@ public class KoikiBatchProperties {
 
     private final Security security = new Security();
 
+    private final Transaction transaction = new Transaction();
+
     public ConcurrencyGuard getConcurrencyGuard() {
         return concurrencyGuard;
     }
@@ -39,6 +41,10 @@ public class KoikiBatchProperties {
 
     public Security getSecurity() {
         return security;
+    }
+
+    public Transaction getTransaction() {
+        return transaction;
     }
 
     /** Concurrency guard against multiple running executions of the same job. */
@@ -124,6 +130,26 @@ public class KoikiBatchProperties {
             public void setSensitiveKeys(Set<String> sensitiveKeys) {
                 this.sensitiveKeys = sensitiveKeys;
             }
+        }
+    }
+
+    /**
+     * Transaction policy defaults. The framework does not create a transaction
+     * manager bean (see {@code docs/batch/db-management-architecture.md}); this
+     * only exposes a default commit boundary that jobs reference explicitly when
+     * building chunk steps.
+     */
+    public static class Transaction {
+
+        /** Default chunk commit interval (commit boundary) for chunk-oriented steps. */
+        private int defaultCommitInterval = 100;
+
+        public int getDefaultCommitInterval() {
+            return defaultCommitInterval;
+        }
+
+        public void setDefaultCommitInterval(int defaultCommitInterval) {
+            this.defaultCommitInterval = defaultCommitInterval;
         }
     }
 

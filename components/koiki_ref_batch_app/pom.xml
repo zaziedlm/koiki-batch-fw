@@ -5,6 +5,13 @@
   <dependencies>
     <dependency><groupId>org.koikifw</groupId><artifactId>libkoiki-batch</artifactId><version>${project.version}</version></dependency>
     <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter</artifactId></dependency>
+    <!-- DB-backed batch: JDBC JobRepository + business data access via a single shared DataSource. -->
+    <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-jdbc</artifactId></dependency>
+    <dependency><groupId>org.flywaydb</groupId><artifactId>flyway-core</artifactId></dependency>
+    <!-- Spring Boot 4 splits auto-configuration into per-technology modules;
+         flyway-core alone does not enable Flyway auto-configuration. -->
+    <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-flyway</artifactId></dependency>
+    <dependency><groupId>com.h2database</groupId><artifactId>h2</artifactId><scope>runtime</scope></dependency>
     <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-test</artifactId><scope>test</scope></dependency>
     <dependency><groupId>org.springframework.batch</groupId><artifactId>spring-batch-test</artifactId><scope>test</scope></dependency>
   </dependencies>

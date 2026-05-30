@@ -39,6 +39,20 @@ class BatchCoreAutoConfigurationTest {
     }
 
     @Test
+    void transactionDefaultCommitIntervalDefaultsTo100() {
+        runner.run(context ->
+                assertThat(context.getBean(KoikiBatchProperties.class)
+                        .getTransaction().getDefaultCommitInterval()).isEqualTo(100));
+    }
+
+    @Test
+    void transactionDefaultCommitIntervalIsBindable() {
+        runner.withPropertyValues("koiki.batch.transaction.default-commit-interval=500")
+                .run(context -> assertThat(context.getBean(KoikiBatchProperties.class)
+                        .getTransaction().getDefaultCommitInterval()).isEqualTo(500));
+    }
+
+    @Test
     void maskerCanBeDisabledWhileAuditStaysEnabled() {
         runner.withPropertyValues("koiki.batch.security.masking.enabled=false")
                 .run(context -> {

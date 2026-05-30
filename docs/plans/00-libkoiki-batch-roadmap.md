@@ -43,7 +43,7 @@
 | 1 | `observability` | 詳細化済み（実装中） | [40-observability](40-observability.md) / [tasks](../tasks/40-observability.md) |
 | 2 | `audit` | 詳細化済み（実装中） | [50-audit](50-audit.md) / [tasks](../tasks/50-audit.md) |
 | 3 | `security` | 詳細化済み（実装中） | [60-security](60-security.md) / [tasks](../tasks/60-security.md) |
-| 4 | `transaction`, `validation` | 要約 | 後続ラウンド |
+| 4 | `transaction`, `validation`（DB-backed 基盤） | 詳細化済み（実装中） | [db-management-architecture](../batch/db-management-architecture.md) / [70-plan](70-transaction-validation.md)・[70-task](../tasks/70-transaction-validation.md) |
 | 5 | `io`, `support` | 要約 | 後続ラウンド |
 
 ### Phase 0 — 基盤（core / execution / fault）
@@ -74,12 +74,14 @@
 - **検証ポイント**: マスキング対象がログ・監査に素のまま出ないこと。
 - **deferred**: 個人情報クラス別の標準マスキングルール、アプリ固有の認可モデル。
 
-### Phase 4 — transaction / validation
+### Phase 4 — transaction / validation（DB-backed 基盤）
 
-- **狙い**: トランザクション境界方針の共通化と、再利用可能な検証契約。
-- **主要成果物**: コミット境界/ロールバック方針ヘルパー、`Validator` 契約（パラメータ/入力/業務前提）。
-- **検証ポイント**: 参照ジョブの chunk/tasklet step で境界が明示され、検証契約が使われること。
-- **deferred**: マルチDBジョブ向け標準トランザクションマネージャ選定。
+- **狙い**: SB6 の DB管理「あるべき論」に基づき、業務 RDBMS アクセス・チャンク管理・トランザクション境界を責務分離して共通化し、再利用可能な検証契約を提供する。
+- **前提（あるべき論）**: [db-management-architecture.md](../batch/db-management-architecture.md) を正とする。メタデータは Resourceless 既定・JDBC 標準オプトイン、DB-backed は単一 DataSource 共有（chunk + メタ原子コミット）、スキーマは Flyway 一元。
+- **主要成果物**: `koiki.batch.transaction.defaultCommitInterval` とコミット境界/ロールバック方針ガイド（TM bean は作らない）、`Validator` 契約（`ValidationResult`/`ValidationError`/`ValidationException`→終了コード20）、参照アプリの DB-backed chunk ジョブ（H2 + Flyway、標準 SB reader/writer）。
+- **検証ポイント**: 参照ジョブの chunk step で境界が `defaultCommitInterval` により明示され、`Validator` 契約が processor で使われ、メタデータが永続（リスタート土台）すること。
+- **進め方**: Stage A（DB管理アーキテクチャ文書 + decision-log）を先行・合意 → Stage B（`70-transaction-validation` の plan/task と実装）。
+- **deferred**: マルチDBジョブ向け標準トランザクションマネージャ選定（`@BatchDataSource`）、io reader/writer 契約（Phase 5）、本番DB方言（Oracle/PostgreSQL）。
 
 ### Phase 5 — io / support
 
