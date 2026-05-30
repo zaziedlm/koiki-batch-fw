@@ -11,6 +11,7 @@ import org.koikifw.libkoiki.batch.fault.FaultClassifier;
 import org.koikifw.libkoiki.batch.fault.KoikiBatchExitCodeGenerator;
 import org.koikifw.libkoiki.batch.observability.JobLogListener;
 import org.koikifw.libkoiki.batch.observability.StepLogListener;
+import org.koikifw.libkoiki.batch.security.Masker;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -33,7 +34,18 @@ class BatchCoreAutoConfigurationTest {
             assertThat(context).hasSingleBean(AuditEventPublisher.class);
             assertThat(context.getBean(AuditEventPublisher.class))
                     .isInstanceOf(LoggingAuditEventPublisher.class);
+            assertThat(context).hasSingleBean(Masker.class);
         });
+    }
+
+    @Test
+    void maskerCanBeDisabledWhileAuditStaysEnabled() {
+        runner.withPropertyValues("koiki.batch.security.masking.enabled=false")
+                .run(context -> {
+                    assertThat(context).doesNotHaveBean(Masker.class);
+                    // Audit publishing still works; it simply passes values through unmasked.
+                    assertThat(context).hasSingleBean(AuditEventPublisher.class);
+                });
     }
 
     @Test

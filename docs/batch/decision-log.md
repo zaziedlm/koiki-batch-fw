@@ -59,3 +59,11 @@ Decision: integration tests (`*IT`) run under the Maven Failsafe plugin via `mvn
 Reason: Surefire does not execute `*IT` classes, so the reference-app integration tests (including the pre-existing placeholder) never ran. Binding Failsafe makes integration tests first-class without changing the unit-test command.
 
 Impact: the default quick check stays `mvn clean test`; full verification including job/exit-code integration tests is `mvn verify`.
+
+## 2026-05-30: Phase 3 Masking Boundary
+
+Decision: provide masking through two cooperating but separate hooks — value-level masking for audit attributes (a `Masker` SPI applied by `LoggingAuditEventPublisher` to attribute values whose key is in a configured sensitive-key set) and text-level masking for application logs (a Logback `MaskingPatternConverter` that redacts regex matches).
+
+Reason: the two outputs have different shapes. Audit attributes are structured `key=value` pairs, so a key-based decision is precise and DI-friendly. Free-form log messages have no keys, so masking there must match text patterns, and Logback converters are created by Logback (not Spring), so they cannot receive an injected `Masker`. Forcing both through one mechanism would require a brittle Spring-to-Logback bridge. Standard personal-data masking rules are deferred, so the framework ships the mechanism and applications supply the sensitive keys / regex patterns.
+
+Impact: `org.koikifw.libkoiki.batch.security` exposes `Masker` + `RedactingMasker` (full redaction to `***`) and `MaskingPatternConverter`. Audit value masking is logging-backend neutral (SLF4J only); only `MaskingPatternConverter` needs Logback, which is therefore an `optional` dependency of `libkoiki-batch` so log4j2 applications are not forced onto Logback. Configuration is under `koiki.batch.security.masking.{enabled,mask,sensitive-keys}`; applications register the converter via their own `logback-spring.xml` `<conversionRule converterClass=...>` (properties-only converter registration is not relied upon).

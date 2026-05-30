@@ -12,7 +12,10 @@ import org.koikifw.libkoiki.batch.fault.KoikiBatchExitCodeGenerator;
 import org.koikifw.libkoiki.batch.fault.KoikiExitCodeExceptionMapper;
 import org.koikifw.libkoiki.batch.observability.JobLogListener;
 import org.koikifw.libkoiki.batch.observability.StepLogListener;
+import org.koikifw.libkoiki.batch.security.Masker;
+import org.koikifw.libkoiki.batch.security.RedactingMasker;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -93,8 +96,17 @@ public class BatchCoreAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    @ConditionalOnProperty(prefix = "koiki.batch.security.masking", name = "enabled", matchIfMissing = true)
+    public Masker masker(KoikiBatchProperties properties) {
+        return new RedactingMasker(properties.getSecurity().getMasking().getMask());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     @ConditionalOnProperty(prefix = "koiki.batch.audit", name = "enabled", matchIfMissing = true)
-    public AuditEventPublisher auditEventPublisher() {
-        return new LoggingAuditEventPublisher();
+    public AuditEventPublisher auditEventPublisher(KoikiBatchProperties properties, ObjectProvider<Masker> masker) {
+        return new LoggingAuditEventPublisher(
+                masker.getIfAvailable(),
+                properties.getSecurity().getMasking().getSensitiveKeys());
     }
 }

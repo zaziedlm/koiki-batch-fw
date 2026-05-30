@@ -4,8 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
+import org.koikifw.libkoiki.batch.security.RedactingMasker;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -110,6 +113,55 @@ class LoggingAuditEventPublisherTest {
         assertThatCode(() -> publisher.publish(null)).doesNotThrowAnyException();
         // The audit appender must not have received anything for the failed call.
         assertThat(appender.list).isEmpty();
+    }
+
+    @Test
+    void masksSensitiveAttributeValuesAndLeavesOthersClear() {
+        Map<String, String> attributes = new LinkedHashMap<>();
+        attributes.put("customerCount", "1234");
+        attributes.put("accountId", "ACC-9876");
+        AuditEvent event = AuditEventBuilder.builder()
+                .eventType("CUSTOMER_SYNCED")
+                .message("done")
+                .build();
+        // Build an event carrying both attributes via the record directly.
+        AuditEvent withAttrs = new AuditEvent(event.occurredAt(), event.eventType(), event.message(),
+                null, null, null, null, attributes);
+
+        String line = LoggingAuditEventPublisher.format(
+                withAttrs, new RedactingMasker(), Set.of("accountId"));
+
+        assertThat(line)
+                .contains("attr.customerCount=\"1234\"")
+                .contains("attr.accountId=\"" + RedactingMasker.DEFAULT_MASK + "\"")
+                .doesNotContain("ACC-9876");
+    }
+
+    @Test
+    void doesNotMaskWhenNoMaskerConfigured() {
+        AuditEvent event = new AuditEvent(
+                Instant.parse("2026-05-30T01:23:45Z"), "TYPE", "msg",
+                null, null, null, null, Map.of("accountId", "ACC-9876"));
+
+        assertThat(LoggingAuditEventPublisher.format(event, null, Set.of("accountId")))
+                .contains("attr.accountId=\"ACC-9876\"");
+    }
+
+    @Test
+    void publishWithMaskerMasksSensitiveAttribute() {
+        LoggingAuditEventPublisher maskingPublisher =
+                new LoggingAuditEventPublisher(new RedactingMasker(), Set.of("accountId"));
+
+        AuditEvent event = new AuditEvent(
+                Instant.parse("2026-05-30T01:23:45Z"), "CUSTOMER_SYNCED", "done",
+                null, null, null, null, Map.of("accountId", "ACC-9876"));
+
+        maskingPublisher.publish(event);
+
+        assertThat(appender.list).hasSize(1);
+        assertThat(appender.list.get(0).getFormattedMessage())
+                .contains("attr.accountId=\"" + RedactingMasker.DEFAULT_MASK + "\"")
+                .doesNotContain("ACC-9876");
     }
 
     @Test

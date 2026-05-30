@@ -1,7 +1,10 @@
 package org.koikifw.libkoiki.batch.audit;
 
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
+import org.koikifw.libkoiki.batch.security.Masker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -17,6 +20,14 @@ import org.slf4j.MarkerFactory;
  * {@code null} are omitted. Free-form values ({@code message} and attribute
  * values) are double-quoted; callers must not embed double-quotes or newlines
  * in them.</p>
+ *
+ * <p>When constructed with a {@link Masker} and a set of sensitive attribute
+ * keys, attribute values whose key is in that set are passed through the masker
+ * before being written, so configured sensitive data never reaches the audit
+ * log in the clear. The {@code message} field is free-form and not key-based:
+ * keep personal data out of it (or apply a text-level mask at the logging
+ * layer). This publisher is SLF4J-only and does not depend on any particular
+ * logging backend.</p>
  *
  * <p>The publisher never throws: any failure during formatting or logging is
  * captured and reported to this class's own (non-audit) logger as a warning.</p>
@@ -35,16 +46,44 @@ public class LoggingAuditEventPublisher implements AuditEventPublisher {
 
     private static final Logger DIAGNOSTIC_LOGGER = LoggerFactory.getLogger(LoggingAuditEventPublisher.class);
 
+    private final Masker masker;
+
+    private final Set<String> sensitiveKeys;
+
+    /** Creates a publisher that writes audit events without masking. */
+    public LoggingAuditEventPublisher() {
+        this(null, Set.of());
+    }
+
+    /**
+     * Creates a publisher that masks attribute values whose key is listed in
+     * {@code sensitiveKeys}.
+     *
+     * @param masker        masker applied to sensitive attribute values; when
+     *                      {@code null}, no masking is performed
+     * @param sensitiveKeys attribute keys whose values must be masked; a defensive
+     *                      copy is taken (may be {@code null}, treated as empty)
+     */
+    public LoggingAuditEventPublisher(Masker masker, Set<String> sensitiveKeys) {
+        this.masker = masker;
+        this.sensitiveKeys = sensitiveKeys == null ? Set.of() : new LinkedHashSet<>(sensitiveKeys);
+    }
+
     @Override
     public void publish(AuditEvent event) {
         try {
-            AUDIT_LOGGER.info(AUDIT_MARKER, format(event));
+            AUDIT_LOGGER.info(AUDIT_MARKER, format(event, masker, sensitiveKeys));
         } catch (Exception ex) {
             DIAGNOSTIC_LOGGER.warn("Failed to publish audit event of type {}", safeType(event), ex);
         }
     }
 
+    /** Formats an event without masking (used by tests and as a default). */
     static String format(AuditEvent event) {
+        return format(event, null, Set.of());
+    }
+
+    static String format(AuditEvent event, Masker masker, Set<String> sensitiveKeys) {
         StringBuilder sb = new StringBuilder();
         sb.append("occurredAt=").append(event.occurredAt());
         sb.append(" eventType=").append(event.eventType());
@@ -54,9 +93,17 @@ public class LoggingAuditEventPublisher implements AuditEventPublisher {
         appendIfNotNull(sb, "bizDate", event.bizDate());
         appendIfNotNull(sb, "requestId", event.requestId());
         for (Map.Entry<String, String> entry : event.attributes().entrySet()) {
-            sb.append(" attr.").append(entry.getKey()).append("=\"").append(entry.getValue()).append('"');
+            String value = maskIfSensitive(entry.getKey(), entry.getValue(), masker, sensitiveKeys);
+            sb.append(" attr.").append(entry.getKey()).append("=\"").append(value).append('"');
         }
         return sb.toString();
+    }
+
+    private static String maskIfSensitive(String key, String value, Masker masker, Set<String> sensitiveKeys) {
+        if (masker != null && sensitiveKeys.contains(key)) {
+            return masker.mask(value);
+        }
+        return value;
     }
 
     private static void appendIfNotNull(StringBuilder sb, String key, Object value) {
