@@ -32,12 +32,12 @@
 # アーカイブ生成（デプロイ後に一度だけ実行）
 java -XX:ArchiveClassesAtExit=customer-a.jsa \
      -cp "lib/*:customer-a-batch-app-0.1.0-SNAPSHOT.jar" \
-     com.customer.a.batch.CustomerABatchApp
+     org.koikifw.customer.a.batch.CustomerABatchApp
 
 # 通常起動（JP1ジョブ定義に追加）
 java -XX:SharedArchiveFile=customer-a.jsa \
      -cp "lib/*:customer-a-batch-app-0.1.0-SNAPSHOT.jar" \
-     com.customer.a.batch.CustomerABatchApp
+     org.koikifw.customer.a.batch.CustomerABatchApp
 ```
 
 ### 2. JVMヒープのサイジング
