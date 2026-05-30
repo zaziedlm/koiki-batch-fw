@@ -44,7 +44,7 @@
 | 2 | `audit` | 詳細化済み（実装中） | [50-audit](50-audit.md) / [tasks](../tasks/50-audit.md) |
 | 3 | `security` | 詳細化済み（実装中） | [60-security](60-security.md) / [tasks](../tasks/60-security.md) |
 | 4 | `transaction`, `validation`（DB-backed 基盤） | 詳細化済み（実装中） | [db-management-architecture](../batch/db-management-architecture.md) / [70-plan](70-transaction-validation.md)・[70-task](../tasks/70-transaction-validation.md) |
-| 5 | `io`, `support` | 要約 | 後続ラウンド |
+| 5 | `io`, `support` | 詳細化済み（実装中） | [80-io-support](80-io-support.md) / [tasks](../tasks/80-io-support.md) |
 
 ### Phase 0 — 基盤（core / execution / fault）
 
