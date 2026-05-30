@@ -42,7 +42,7 @@
 | 0 | `core`, `execution`, `fault` | 実装済み（SB 6.0.3 / Boot 4.0.6、全テスト通過） | [10-core](10-core.md)・[20-execution](20-execution.md)・[30-fault](30-fault.md) / [tasks](../tasks/) |
 | 1 | `observability` | 詳細化済み（実装中） | [40-observability](40-observability.md) / [tasks](../tasks/40-observability.md) |
 | 2 | `audit` | 詳細化済み（実装中） | [50-audit](50-audit.md) / [tasks](../tasks/50-audit.md) |
-| 3 | `security` | 要約 | 後続ラウンド |
+| 3 | `security` | 詳細化済み（実装中） | [60-security](60-security.md) / [tasks](../tasks/60-security.md) |
 | 4 | `transaction`, `validation` | 要約 | 後続ラウンド |
 | 5 | `io`, `support` | 要約 | 後続ラウンド |
 
