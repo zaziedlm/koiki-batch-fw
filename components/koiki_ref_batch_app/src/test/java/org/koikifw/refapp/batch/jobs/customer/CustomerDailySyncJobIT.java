@@ -45,9 +45,12 @@ class CustomerDailySyncJobIT {
 
     @Test
     void rejectsMissingRequestId() {
+        // Distinct bizDate per invalid-parameter test: with the JDBC JobRepository the
+        // launch persists a JobInstance before validation fails, so identical parameters
+        // across tests would collide. Production launches use a unique requestId.
         JobParameters params = new JobParametersBuilder()
                 .addString(StandardJobParameters.JOB_NAME, CustomerDailySyncJobConfig.JOB_NAME)
-                .addString(StandardJobParameters.BIZ_DATE, "20260527")
+                .addString(StandardJobParameters.BIZ_DATE, "20260601")
                 .toJobParameters();
         assertThatThrownBy(() -> jobOperator.start(customerDailySyncJob, params))
                 .isInstanceOf(InvalidJobParametersException.class);
@@ -66,7 +69,7 @@ class CustomerDailySyncJobIT {
     void invalidParametersResolveToBusinessErrorExitCodeViaMapper() {
         JobParameters params = new JobParametersBuilder()
                 .addString(StandardJobParameters.JOB_NAME, CustomerDailySyncJobConfig.JOB_NAME)
-                .addString(StandardJobParameters.BIZ_DATE, "20260527")
+                .addString(StandardJobParameters.BIZ_DATE, "20260602")
                 .toJobParameters();
 
         InvalidJobParametersException thrown = catchInvalidJobParametersException(params);
