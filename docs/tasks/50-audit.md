@@ -5,7 +5,7 @@
 | 対象パッケージ | `org.koikifw.libkoiki.batch.audit` |
 | 計画 | [50-audit.md](../plans/50-audit.md) |
 | 検証コマンド | `.\mvnw.cmd clean verify`（IT 込み） |
-| ステータス | Not started |
+| ステータス | Done（監査イベント/Publisher/参照アプリ IT 通過。formatter escape 強化済み） |
 
 共通の準拠事項は [ロードマップの準拠仕様](../plans/00-libkoiki-batch-roadmap.md) に従う。非推奨 API は不使用、Spring 標準イディオム（`@AutoConfiguration` / `@ConditionalOn*` / constructor injection）に揃える。
 

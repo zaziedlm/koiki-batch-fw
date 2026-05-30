@@ -4,7 +4,6 @@
   <artifactId>customer-a-batch-app</artifactId>
   <dependencies>
     <dependency><groupId>org.koikifw</groupId><artifactId>libkoiki-batch</artifactId><version>${project.version}</version></dependency>
-    <dependency><groupId>org.koikifw</groupId><artifactId>koiki-ref-batch-app</artifactId><version>${project.version}</version></dependency>
     <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-test</artifactId><scope>test</scope></dependency>
     <dependency><groupId>org.springframework.batch</groupId><artifactId>spring-batch-test</artifactId><scope>test</scope></dependency>
   </dependencies>

@@ -4,12 +4,12 @@
 | --- | --- |
 | 対象バージョン | `v0.1.0` |
 | 対象パッケージ | `org.koikifw.libkoiki.batch.core` |
-| ステータス | Draft |
+| ステータス | Done（`v0.1.0` 初期スコープを実装済み） |
 | 関連 | [ロードマップ](00-libkoiki-batch-roadmap.md) / [タスク](../tasks/10-core.md) / [platform-capabilities.md](../batch/platform-capabilities.md) / [boundaries.md](../agent/boundaries.md) |
 
 ## 狙い
 
-`core` は framework の自動構成入口。現状 [BatchCoreAutoConfiguration.java](../../components/libkoiki-batch/src/main/java/org/koikifw/libkoiki/batch/core/BatchCoreAutoConfiguration.java) は空の `@Configuration` で、`AutoConfiguration.imports` も未登録のため**自動構成が一切効かない**。ここを実体化し、後続 Phase の bean（listener / classifier / exit-code generator / concurrency guard）を登録する受け皿を用意する。これが全 Phase の前提となる最優先項目。
+`core` は framework の自動構成入口。現在は [BatchCoreAutoConfiguration.java](../../components/libkoiki-batch/src/main/java/org/koikifw/libkoiki/batch/core/BatchCoreAutoConfiguration.java) が `@AutoConfiguration` として実体化され、`AutoConfiguration.imports` にも登録済みである。後続 Phase の listener / classifier / exit-code generator / concurrency guard / audit / security / io 関連 bean を、Spring Boot の Batch インフラを再定義せず追加する受け皿になっている。
 
 ## 準拠仕様（Spring Batch 6.0.x / Spring Boot 4）
 

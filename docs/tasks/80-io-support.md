@@ -5,7 +5,7 @@
 | 対象パッケージ | `org.koikifw.libkoiki.batch.io` / `.../support` |
 | 計画 | [80-io-support.md](../plans/80-io-support.md) |
 | 検証コマンド | `.\mvnw.cmd clean verify`（IT 込み） |
-| ステータス | Not started |
+| ステータス | Done（charset、取込 lifecycle、atomic output、参照 file job IT 通過。昇格失敗は fail-fast 化済み） |
 
 共通の準拠事項は [ロードマップの準拠仕様](../plans/00-libkoiki-batch-roadmap.md) に従う。標準 SB reader/writer を使い、framework は **A:文字コード / B:取込ライフサイクル / C:アトミック出力** の汎用 IO 付加価値に限定。SB6 フラットファイルは `org.springframework.batch.infrastructure.item.file.*`。
 
@@ -41,8 +41,8 @@
 ## IOS-05: AtomicFileOutput + AtomicOutputListener（C）
 
 - **対象（新規）**: `io/AtomicFileOutput.java`（`Path tempPath(Path finalPath, String suffix)`、`void promote(Path temp, Path finalPath)`、`void discard(Path temp)`）、`io/AtomicOutputListener.java`（opt-in `JobExecutionListener`）。
-- **準拠**: listener は最終パス（パラメータ `OUTPUT_FILE_PARAMETER="koiki.io.outputFile"`）に対し `afterJob`：`COMPLETED`→`promote(temp,final)`、他→`discard(temp)`。temp は `tempSuffix` 規約。出力未指定で no-op。promote/discard 失敗は warn のみ。
-- **受け入れ**: 完了で temp→final 昇格、失敗で temp 破棄、no-op、非throw。
+- **準拠**: listener は最終パス（パラメータ `OUTPUT_FILE_PARAMETER="koiki.io.outputFile"`）に対し `afterJob`：`COMPLETED`→`promote(temp,final)`、他→`discard(temp)`。temp は `tempSuffix` 規約。出力未指定で no-op。promote 失敗は `SystemException`（終了コード30分類）として fail-fast、discard 失敗は warn のみ。
+- **受け入れ**: 完了で temp→final 昇格、失敗で temp 破棄、no-op、promote 失敗時にジョブが成功扱いにならない。
 - **依存**: IOS-01。
 
 ## IOS-06: core 自動構成への登録

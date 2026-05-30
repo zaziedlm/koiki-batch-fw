@@ -138,6 +138,49 @@ class LoggingAuditEventPublisherTest {
     }
 
     @Test
+    void formatEscapesQuotedValuesAndKeepsOneLogicalLine() {
+        Map<String, String> attributes = new LinkedHashMap<>();
+        attributes.put("note", "a\"b\\c\r\n\tend");
+        attributes.put("nullable", null);
+        AuditEvent event = new AuditEvent(
+                Instant.parse("2026-05-30T01:23:45Z"),
+                "TYPE",
+                "line1\nline2 \"quoted\" \\ path",
+                null, null, null, null, attributes);
+
+        String line = LoggingAuditEventPublisher.format(event);
+
+        assertThat(line)
+                .contains("message=\"line1\\nline2 \\\"quoted\\\" \\\\ path\"")
+                .contains("attr.note=\"a\\\"b\\\\c\\r\\n\\tend\"")
+                .contains("attr.nullable=\"\"")
+                .doesNotContain("\r")
+                .doesNotContain("\n")
+                .doesNotContain("\t");
+    }
+
+    @Test
+    void formatEscapesMaskedAndUnmaskedValues() {
+        Map<String, String> attributes = new LinkedHashMap<>();
+        attributes.put("accountId", "ACC-\n9876");
+        attributes.put("description", "raw\nvalue");
+        AuditEvent event = new AuditEvent(
+                Instant.parse("2026-05-30T01:23:45Z"),
+                "TYPE",
+                "msg",
+                null, null, null, null, attributes);
+
+        String line = LoggingAuditEventPublisher.format(
+                event, new RedactingMasker("mask\nvalue"), Set.of("accountId"));
+
+        assertThat(line)
+                .contains("attr.accountId=\"mask\\nvalue\"")
+                .contains("attr.description=\"raw\\nvalue\"")
+                .doesNotContain("ACC-")
+                .doesNotContain("\n");
+    }
+
+    @Test
     void doesNotMaskWhenNoMaskerConfigured() {
         AuditEvent event = new AuditEvent(
                 Instant.parse("2026-05-30T01:23:45Z"), "TYPE", "msg",

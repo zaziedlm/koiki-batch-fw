@@ -43,4 +43,14 @@ class AuditEventTest {
         assertThatThrownBy(() -> event.attributes().put("x", "y"))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
+
+    @Test
+    void attributesCanCarryNullValuesForDefensiveFormatting() {
+        Map<String, String> source = new HashMap<>();
+        source.put("nullable", null);
+
+        AuditEvent event = new AuditEvent(Instant.now(), "TYPE", "msg", null, null, null, null, source);
+
+        assertThat(event.attributes()).containsEntry("nullable", null);
+    }
 }

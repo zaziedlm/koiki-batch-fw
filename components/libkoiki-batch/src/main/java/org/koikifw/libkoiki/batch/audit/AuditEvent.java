@@ -1,6 +1,8 @@
 package org.koikifw.libkoiki.batch.audit;
 
 import java.time.Instant;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -36,6 +38,6 @@ public record AuditEvent(
         Objects.requireNonNull(occurredAt, "occurredAt must not be null");
         Objects.requireNonNull(eventType, "eventType must not be null");
         Objects.requireNonNull(message, "message must not be null");
-        attributes = attributes == null ? Map.of() : Map.copyOf(attributes);
+        attributes = attributes == null ? Map.of() : Collections.unmodifiableMap(new LinkedHashMap<>(attributes));
     }
 }

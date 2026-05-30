@@ -6,7 +6,7 @@ The project is still early, so the goal is to keep tests focused and useful whil
 
 ## Default Verification
 
-The standard repository-level verification command is:
+The standard quick repository-level verification command is:
 
 ```powershell
 .\mvnw.cmd clean test
@@ -14,7 +14,7 @@ The standard repository-level verification command is:
 
 On macOS / Linux, use `./mvnw clean test`.
 
-Use this when a change affects:
+Use this for local regression checks when a change affects:
 
 - Maven POM files
 - Java source code
@@ -26,7 +26,19 @@ Use this when a change affects:
 
 `clean` matters because stale `target/` classes can hide package or dependency problems.
 
-`mvn clean test` runs unit tests only (Surefire). Integration tests follow the `*IT` naming convention and run under the Maven Failsafe plugin during `mvn verify`. Use `mvn verify` to run the job/exit-code integration tests in `koiki_ref_batch_app` (for example `BatchCoreWiringIT`, `CustomerDailySyncJobIT`, `ExitCodeE2EIT`).
+`mvn clean test` runs unit tests only (Surefire). Integration tests follow the `*IT` naming convention and run under the Maven Failsafe plugin during `mvn verify`.
+
+Use `mvn verify` before completing changes that affect:
+
+- Reference-app integration
+- Failsafe or test naming
+- Application launch behavior
+- Exit code behavior
+- DB-backed jobs or Flyway schema
+- File input/output lifecycle
+- Cross-module package or dependency boundaries
+
+Current reference integration tests include `BatchCoreWiringIT`, `CustomerDailySyncJobIT`, `ExitCodeE2EIT`, `CustomerImportJobIT`, and `BillingFileJobIT`.
 
 ## JDK Pin
 
@@ -76,14 +88,13 @@ At minimum, check that referenced files exist and that the document does not con
 
 ## Current Test State
 
-Current tests are mostly placeholders and compile checks.
-
-This is acceptable for the current project stage, but agents should not treat placeholder tests as proof that batch behavior is implemented.
+Current tests include unit tests for framework contracts and integration tests for reference jobs.
 
 Current expectations:
 
 - Unit tests compile.
 - Maven reactor builds.
+- `mvn verify` runs `*IT` integration tests through Failsafe.
 - Java release is 21 (Pleiades-bundled Adoptium Temurin; see JDK Pin above).
 - Spring Boot and Spring Batch dependencies resolve.
 - Package names are valid for Spring Batch 6 APIs.
@@ -160,4 +171,4 @@ Before finishing a code change, report:
 - What verification command was run
 - Whether it passed
 - Any tests that were not run
-- Any residual risk from placeholder tests or missing integration coverage
+- Any residual risk from missing integration coverage

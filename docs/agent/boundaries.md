@@ -6,11 +6,20 @@ Use this as the primary boundary guide for Codex, Claude Code, Kiro, GitHub Copi
 
 ## Package Roots
 
-Official framework and reference packages use `org.koikifw.*`.
+Official framework, reference, and repository-owned customer sample packages use `org.koikifw.*`.
 
 - Shared framework: `org.koikifw.libkoiki.batch.*`
 - Reference app: `org.koikifw.refapp.batch.*`
-- Customer apps: customer-owned package roots, for example `com.customer.a.batch.*`
+- Repository-owned customer sample apps: `org.koikifw.customer.<customer-id>.batch.*`
+- Real downstream customer apps outside this repository may use customer-owned roots, such as `jp.co.customer.example.batch.*` or `com.customer.example.batch.*`, but that decision must be explicit.
+
+`org.koikifw.customer.<customer-id>.batch.*` is a convention for repository-owned sample customer apps only. It is not a technical requirement for real customer systems.
+
+`libkoiki-batch` must remain independent of downstream package roots. A customer app may live outside `org.koikifw.*` when:
+
+- it has a dependency on `libkoiki-batch`
+- its Spring Boot application/component scan includes its own job configuration
+- it does not depend on `koiki-ref-batch-app` for production job implementations
 
 Do not introduce a new root package without recording the decision.
 
@@ -113,6 +122,13 @@ Avoid:
 - Editing `libkoiki-batch` to satisfy one customer without a reusable abstraction
 - Copying framework internals into a customer app
 - Hiding customer-specific behavior in the reference app
+- Depending on `koiki-ref-batch-app` from a customer app, unless it is explicitly documented as a temporary sample shortcut
+
+Dependency direction should normally be:
+
+- Customer app -> `libkoiki-batch`
+- Reference app -> `libkoiki-batch`
+- Customer app should not inherit job implementations from the reference app
 
 ## Documentation Boundary
 

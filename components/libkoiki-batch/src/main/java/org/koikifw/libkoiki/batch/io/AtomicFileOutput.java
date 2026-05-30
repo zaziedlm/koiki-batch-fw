@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
+import org.koikifw.libkoiki.batch.fault.SystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,10 +33,20 @@ public final class AtomicFileOutput {
         return finalPath.resolveSibling(finalPath.getFileName() + safeSuffix);
     }
 
-    /** Moves the temp file to the final path (replacing any existing final file). */
+    /**
+     * Moves the temp file to the final path (replacing any existing final file).
+     *
+     * <p>Promotion is part of successful output publication. Unlike cleanup or
+     * archive moves, promotion failures are not best-effort: they are raised as
+     * {@link SystemException} so schedulers do not observe a successful job with
+     * no final output.</p>
+     */
     public static void promote(Path temp, Path finalPath) {
-        if (temp == null || finalPath == null || !Files.exists(temp)) {
-            return;
+        if (temp == null || finalPath == null) {
+            throw new SystemException("Output file promotion requires both temp and final paths");
+        }
+        if (!Files.exists(temp)) {
+            throw new SystemException("In-progress output file does not exist: " + temp);
         }
         try {
             Path parent = finalPath.getParent();
@@ -48,7 +59,7 @@ public final class AtomicFileOutput {
                 Files.move(temp, finalPath, StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (IOException | RuntimeException ex) {
-            log.warn("Failed to promote output file {} to {}", temp, finalPath, ex);
+            throw new SystemException("Failed to promote output file " + temp + " to " + finalPath, ex);
         }
     }
 

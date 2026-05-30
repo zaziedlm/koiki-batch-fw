@@ -4,12 +4,12 @@
 | --- | --- |
 | 対象バージョン | `v0.1.0` |
 | 対象パッケージ | `org.koikifw.libkoiki.batch.audit` |
-| ステータス | Draft |
+| ステータス | Done（`v0.1.0` 初期スコープを実装済み。formatter escape 強化済み） |
 | 関連 | [ロードマップ](00-libkoiki-batch-roadmap.md) / [タスク](../tasks/50-audit.md) / [platform-capabilities](../batch/platform-capabilities.md) / [decision-log](../batch/decision-log.md) |
 
 ## 狙い
 
-**業務上意味のある変更・制御イベント**を、通常ログとは独立して記録するための共通基盤を提供する。現状 [package-info.java](../../components/libkoiki-batch/src/main/java/org/koikifw/libkoiki/batch/audit/package-info.java) で責務が宣言されているのみで実体はない。
+**業務上意味のある変更・制御イベント**を、通常ログとは独立して記録するための共通基盤を提供する。現在は `AuditEvent`、`AuditEventBuilder`、`AuditEventPublisher`、`LoggingAuditEventPublisher` を実装済みで、参照アプリから監査イベントを発行する integration test も通過している。
 
 監査と通常ログの違い（[platform-capabilities](../batch/platform-capabilities.md) §Enterprise Concerns / Audit）:
 
