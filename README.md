@@ -10,9 +10,11 @@ Current development line: `v0.1.0`
 
 Maven version: `0.1.0-SNAPSHOT`
 
-現時点では、バッチ基盤としての最小構造、Maven マルチモジュール、依存関係のベースライン、責務分離のパッケージ構成、運用ドキュメントの入口、主要な共通機能の初期実装までを整備しています。
+現時点では、バッチ基盤としての最小構造、Maven マルチモジュール、依存関係のベースライン、責務分離のパッケージ構成、運用ドキュメントの入口を整備しています。
 
-参照アプリには、tasklet、DB-backed chunk、file-to-file chunk の実ジョブがあります。監査永続化、分散ロック、本番DB方言、PII クラス別マスキングなどは今後の deferred 項目です。
+`libkoiki-batch` の `v0.1.0` 初期スコープとして、core、execution、fault、observability、audit、security、transaction、validation、io/support の Phase 0-5 は実装済みです。参照アプリには、tasklet、DB-backed chunk、file-to-file chunk の実ジョブがあります。
+
+監査永続化、分散ロック、本番 DB 方言、PII クラス別マスキングなどは deferred 項目です。
 
 ## Technology Baseline
 
@@ -66,6 +68,48 @@ koiki-batch-fw/
 参照業務バッチアプリケーションです。
 
 `libkoiki-batch` の標準的な使い方を示し、顧客アプリを作る際の実装例として機能します。ここにはサンプル業務ジョブ、参照モデル、参照リポジトリ、参照サービスを配置します。
+
+## 参照実装バッチジョブ
+
+`components/koiki_ref_batch_app` には、フレームワーク利用例として以下の Spring Batch ジョブがあります。
+
+| `job.name` | 種別 | 内容 | 主に示している機能 |
+| --- | --- | --- | --- |
+| `customer-daily-sync` | Tasklet | 顧客日次同期を想定した最小ジョブです。実データ更新ではなく、ジョブ起動、標準パラメータ、ログ、監査を確認するための参照実装です。 | 標準パラメータ検証、MDC ログ、監査イベント、マスキング、多重起動ガード、終了コード連携 |
+| `customer-import` | DB chunk | `customer_input` から顧客データを読み取り、検証して `customer` へ登録する DB 更新ジョブです。 | JDBC reader/writer、chunk transaction、commit interval、validation、DB 更新 |
+| `billing-file` | File-to-file chunk | `customerId,amount` 形式の請求ファイルを読み取り、検証後に出力ファイルへ書き出すファイル処理ジョブです。 | 文字コード設定、入力ファイル lifecycle、atomic output、file validation |
+
+`apps/customer_a_batch_app` には `customer-a-billing` のジョブ定義候補がありますが、現時点では実行可能な Spring Batch `Job` 実装は未作成です。
+
+## 参照ジョブの実行例
+
+`customer-daily-sync` は、フレームワークの標準パラメータ、ログ、監査、マスキング、終了コード連携を確認する最小ジョブです。
+
+Windows では以下のように classpath を組み、Java コマンドで実行できます。
+
+```powershell
+$env:JAVA_HOME="$env:APPDATA\Code\User\globalStorage\pleiades.java-extension-pack-jdk\java\21"
+
+.\mvnw.cmd -pl components/koiki_ref_batch_app -am package dependency:copy-dependencies -DskipTests
+
+$cp = @(
+  "components/koiki_ref_batch_app/target/classes",
+  "components/libkoiki-batch/target/classes",
+  "components/koiki_ref_batch_app/target/dependency/*"
+) -join ";"
+
+& "$env:JAVA_HOME\bin\java.exe" `
+  -cp $cp `
+  org.koikifw.refapp.batch.KoikiRefBatchApplication `
+  --spring.batch.job.name=customer-daily-sync `
+  job.name=customer-daily-sync `
+  job.bizDate=20260531 `
+  job.requestId=manual-20260531-001
+
+$LASTEXITCODE
+```
+
+`job.bizDate` は `yyyyMMdd` 形式、`job.requestId` は起動ごとに一意な値を指定します。
 
 ### `apps/*`
 
@@ -186,14 +230,14 @@ $env:JAVA_HOME="$env:APPDATA\Code\User\globalStorage\pleiades.java-extension-pac
 - `docs/batch/migration-guidelines.md`: DB migration 方針
 - `docs/agent/*`: Codex / agent 作業向け補助情報
 
-## Current Gaps
+## Deferred / Future Work
 
-以下は今後の実装・整理対象です。
+以下は、初期実装の外に残している今後の拡張・整理対象です。
 
 - 分散/DB ロックを含む同時実行制御の拡張
 - 監査イベントの永続化方式
 - PII クラス別の標準マスキングルール
-- 本番DB方言（Oracle/PostgreSQL 等）での検証
+- 本番 DB 方言（Oracle/PostgreSQL 等）での検証
 - ファイル取込の詳細な運用モデル、世代管理、リジェクトファイル方針
 - `customer_b_batch_app` など追加顧客アプリ
 - `tests/integration` / `tests/e2e`
