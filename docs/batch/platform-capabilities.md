@@ -34,7 +34,7 @@ This document records the target capability map for KOIKI Batch Framework. It is
 
 Logging should be structured and correlated by job name, job execution id, step name, business date, tenant/customer key where applicable, and scheduler request id where available. Application logs should avoid raw personal data and secrets.
 
-Transaction handling should be explicit at step boundaries. Chunk steps should define commit interval, retry/skip policy, and rollback behavior. Tasklet steps should document whether they are idempotent and how rerun is handled.
+Transaction handling should be explicit at step boundaries. Chunk steps should define commit interval, retry/skip policy, and rollback behavior. Tasklet steps should document whether they are idempotent and how rerun is handled. The DB-backed model (metadata vs business persistence, transaction topology, schema ownership) is defined in [db-management-architecture.md](db-management-architecture.md).
 
 Audit is separate from ordinary logging. Logs help operations diagnose execution; audit records explain business-relevant changes and control events. Audit records should be durable enough for later inspection, but the first implementation can be an interface plus reference implementation.
 
@@ -54,7 +54,7 @@ Security should focus first on masking, secrets boundaries, and avoiding acciden
 
 - Persistence model for audit records
 - Standard metrics registry and naming convention
-- Standard transaction manager selection for multi-database jobs
+- Standard transaction manager selection for multi-database jobs (`@BatchDataSource` topology; see [db-management-architecture.md](db-management-architecture.md))
 - Standard file ingestion archive/error directory model
 - Standard masking rules for personal data classes
 - Exit code catalog beyond the initial `0 / 10 / 20 / 30` convention
