@@ -18,8 +18,8 @@ import org.slf4j.MarkerFactory;
  *
  * <p>Output uses a {@code key=value} line format. Optional fields that are
  * {@code null} are omitted. Free-form values ({@code message} and attribute
- * values) are double-quoted; callers must not embed double-quotes or newlines
- * in them.</p>
+ * values) are double-quoted and escaped so each audit event remains one logical
+ * line.</p>
  *
  * <p>When constructed with a {@link Masker} and a set of sensitive attribute
  * keys, attribute values whose key is in that set are passed through the masker
@@ -87,14 +87,14 @@ public class LoggingAuditEventPublisher implements AuditEventPublisher {
         StringBuilder sb = new StringBuilder();
         sb.append("occurredAt=").append(event.occurredAt());
         sb.append(" eventType=").append(event.eventType());
-        sb.append(" message=\"").append(event.message()).append('"');
+        sb.append(" message=\"").append(escapeQuoted(event.message())).append('"');
         appendIfNotNull(sb, "jobName", event.jobName());
         appendIfNotNull(sb, "jobExecutionId", event.jobExecutionId());
         appendIfNotNull(sb, "bizDate", event.bizDate());
         appendIfNotNull(sb, "requestId", event.requestId());
         for (Map.Entry<String, String> entry : event.attributes().entrySet()) {
             String value = maskIfSensitive(entry.getKey(), entry.getValue(), masker, sensitiveKeys);
-            sb.append(" attr.").append(entry.getKey()).append("=\"").append(value).append('"');
+            sb.append(" attr.").append(entry.getKey()).append("=\"").append(escapeQuoted(value)).append('"');
         }
         return sb.toString();
     }
@@ -114,5 +114,35 @@ public class LoggingAuditEventPublisher implements AuditEventPublisher {
 
     private static String safeType(AuditEvent event) {
         return event == null ? "<null>" : event.eventType();
+    }
+
+    private static String escapeQuoted(String value) {
+        if (value == null) {
+            return "";
+        }
+        StringBuilder escaped = new StringBuilder(value.length());
+        for (int i = 0; i < value.length(); i++) {
+            char ch = value.charAt(i);
+            switch (ch) {
+                case '\\' -> escaped.append("\\\\");
+                case '"' -> escaped.append("\\\"");
+                case '\r' -> escaped.append("\\r");
+                case '\n' -> escaped.append("\\n");
+                case '\t' -> escaped.append("\\t");
+                default -> {
+                    if (Character.isISOControl(ch)) {
+                        escaped.append("\\u");
+                        String hex = Integer.toHexString(ch);
+                        for (int pad = hex.length(); pad < 4; pad++) {
+                            escaped.append('0');
+                        }
+                        escaped.append(hex);
+                    } else {
+                        escaped.append(ch);
+                    }
+                }
+            }
+        }
+        return escaped.toString();
     }
 }
