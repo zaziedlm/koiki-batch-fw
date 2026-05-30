@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.UUID;
 
+import org.koikifw.libkoiki.batch.execution.ConcurrencyGuardService;
 import org.koikifw.libkoiki.batch.execution.StandardJobParameters;
 import org.koikifw.libkoiki.batch.fault.BusinessException;
 import org.koikifw.libkoiki.batch.fault.SystemException;
@@ -19,6 +20,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
@@ -30,8 +32,11 @@ import org.springframework.transaction.PlatformTransactionManager;
 class ExitCodeE2EIT {
 
     private int runJobAndResolveExitCode(String jobName) {
-        ConfigurableApplicationContext context = new SpringApplicationBuilder(
-                KoikiRefBatchApplication.class, FailingJobsConfig.class)
+        return runJobAndResolveExitCode(jobName, KoikiRefBatchApplication.class, FailingJobsConfig.class);
+    }
+
+    private int runJobAndResolveExitCode(String jobName, Class<?>... sources) {
+        ConfigurableApplicationContext context = new SpringApplicationBuilder(sources)
                 .run(
                         "--spring.batch.job.name=" + jobName,
                         StandardJobParameters.JOB_NAME + "=" + jobName,
@@ -59,6 +64,21 @@ class ExitCodeE2EIT {
         assertThat(runJobAndResolveExitCode("e2e-system-failure-job")).isEqualTo(30);
     }
 
+    /**
+     * Verifies that the concurrency guard rejection path travels through
+     * {@link org.koikifw.libkoiki.batch.execution.ConcurrencyGuardJobListener} →
+     * {@link SystemException} → {@code KoikiBatchExitCodeGenerator} → exit 30.
+     * The denying guard is supplied as a {@code @Primary} bean so it overrides
+     * the framework's default {@link org.koikifw.libkoiki.batch.execution.JobRepositoryConcurrencyGuardService}.
+     */
+    @Test
+    void concurrencyGuardRejectionExitsThirty() {
+        int exit = runJobAndResolveExitCode(
+                "customer-daily-sync",
+                KoikiRefBatchApplication.class, DenyingGuardConfig.class);
+        assertThat(exit).isEqualTo(30);
+    }
+
     @Configuration
     static class FailingJobsConfig {
 
@@ -83,6 +103,16 @@ class ExitCodeE2EIT {
                     .tasklet(tasklet, transactionManager)
                     .build();
             return new JobBuilder(name, jobRepository).start(step).build();
+        }
+    }
+
+    @Configuration
+    static class DenyingGuardConfig {
+
+        @Bean
+        @Primary
+        ConcurrencyGuardService denyingConcurrencyGuardService() {
+            return execution -> false;
         }
     }
 }

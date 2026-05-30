@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.UUID;
 
 import org.koikifw.libkoiki.batch.execution.StandardJobParameters;
+import org.koikifw.libkoiki.batch.fault.KoikiExitCodeExceptionMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.job.Job;
@@ -25,6 +26,9 @@ class CustomerDailySyncJobIT {
 
     @Autowired
     private Job customerDailySyncJob;
+
+    @Autowired
+    private KoikiExitCodeExceptionMapper exitCodeExceptionMapper;
 
     private JobParametersBuilder validParameters() {
         return new JobParametersBuilder()
@@ -47,5 +51,37 @@ class CustomerDailySyncJobIT {
                 .toJobParameters();
         assertThatThrownBy(() -> jobOperator.start(customerDailySyncJob, params))
                 .isInstanceOf(InvalidJobParametersException.class);
+    }
+
+    /**
+     * The framework's {@link KoikiExitCodeExceptionMapper} is what makes the
+     * Spring Boot launch path return exit 20 when {@code JobLauncherApplicationRunner}
+     * fails with {@link InvalidJobParametersException} before any
+     * {@code JobExecution} (and therefore any {@code JobExecutionEvent}) exists.
+     * This verifies the registered mapper bean — produced by the auto-configuration
+     * and consumed by Boot's exit-code resolution — really resolves that exception
+     * chain to 20.
+     */
+    @Test
+    void invalidParametersResolveToBusinessErrorExitCodeViaMapper() {
+        JobParameters params = new JobParametersBuilder()
+                .addString(StandardJobParameters.JOB_NAME, CustomerDailySyncJobConfig.JOB_NAME)
+                .addString(StandardJobParameters.BIZ_DATE, "20260527")
+                .toJobParameters();
+
+        InvalidJobParametersException thrown = catchInvalidJobParametersException(params);
+
+        assertThat(exitCodeExceptionMapper.getExitCode(thrown)).isEqualTo(20);
+    }
+
+    private InvalidJobParametersException catchInvalidJobParametersException(JobParameters params) {
+        try {
+            jobOperator.start(customerDailySyncJob, params);
+            throw new AssertionError("Expected InvalidJobParametersException");
+        } catch (InvalidJobParametersException ex) {
+            return ex;
+        } catch (Exception ex) {
+            throw new AssertionError("Expected InvalidJobParametersException but got " + ex.getClass(), ex);
+        }
     }
 }

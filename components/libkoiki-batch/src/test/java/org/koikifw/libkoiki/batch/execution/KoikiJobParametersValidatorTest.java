@@ -43,4 +43,50 @@ class KoikiJobParametersValidatorTest {
                 .isInstanceOf(InvalidJobParametersException.class)
                 .hasMessageContaining(StandardJobParameters.BIZ_DATE);
     }
+
+    @Test
+    void rejectsBizDateWithValidFormatButImpossibleCalendarDate() {
+        JobParameters params = valid()
+                .addString(StandardJobParameters.BIZ_DATE, "20260230")
+                .toJobParameters();
+        assertThatThrownBy(() -> validator.validate(params))
+                .isInstanceOf(InvalidJobParametersException.class)
+                .hasMessageContaining(StandardJobParameters.BIZ_DATE);
+    }
+
+    @Test
+    void rejectsMissingJobName() {
+        JobParameters params = new JobParametersBuilder()
+                .addString(StandardJobParameters.BIZ_DATE, "20260527")
+                .addString(StandardJobParameters.REQUEST_ID, "req-001")
+                .toJobParameters();
+        assertThatThrownBy(() -> validator.validate(params))
+                .isInstanceOf(InvalidJobParametersException.class);
+    }
+
+    @Test
+    void rejectsBlankBizDate() {
+        JobParameters params = valid()
+                .addString(StandardJobParameters.BIZ_DATE, "   ")
+                .toJobParameters();
+        assertThatThrownBy(() -> validator.validate(params))
+                .isInstanceOf(InvalidJobParametersException.class)
+                .hasMessageContaining(StandardJobParameters.BIZ_DATE);
+    }
+
+    /**
+     * Locks the contract that downstream apps may pass additional parameters
+     * (incrementer-injected {@code run.id}, customer-app-specific keys, etc.)
+     * without being rejected. The composition leaves {@code optionalKeys} empty
+     * which {@code DefaultJobParametersValidator} interprets as "no enforcement
+     * on extras"; only the three required keys are enforced.
+     */
+    @Test
+    void acceptsExtraUnknownKeys() {
+        JobParameters params = valid()
+                .addString("customer.region", "JP-EAST")
+                .addLong("run.id", 1L)
+                .toJobParameters();
+        assertThatCode(() -> validator.validate(params)).doesNotThrowAnyException();
+    }
 }

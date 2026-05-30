@@ -28,16 +28,18 @@ Use this when a change affects:
 
 `mvn clean test` runs unit tests only (Surefire). Integration tests follow the `*IT` naming convention and run under the Maven Failsafe plugin during `mvn verify`. Use `mvn verify` to run the job/exit-code integration tests in `koiki_ref_batch_app` (for example `BatchCoreWiringIT`, `CustomerDailySyncJobIT`, `ExitCodeE2EIT`).
 
-## Windows / VS Code Java Extension Pack
+## JDK Pin
 
-Maven Wrapper is checked in, so agents should not need to locate a local Maven installation.
-
-When Java is managed by VS Code Extension Pack for Java Auto Config and `java` is not on PATH, set `JAVA_HOME` when needed:
+The repository pins development builds to **Adoptium Temurin 21 (LTS)** as bundled by the **`pleiades.java-extension-pack-jdk`** VS Code extension. This matches the JDK exposed on the interactive PowerShell `PATH` and avoids the older JRE that ships inside `redhat.java`.
 
 ```powershell
 $env:JAVA_HOME="$env:APPDATA\Code\User\globalStorage\pleiades.java-extension-pack-jdk\java\21"
-.\mvnw.cmd clean test
+.\mvnw.cmd clean verify
 ```
+
+Maven Wrapper is checked in, so no local Maven installation is required.
+
+When this pin is changed (e.g. moving to a standalone Adoptium install or adopting Java 25 LTS), update this section *and* the `decision-log` so downstream environments and agents pick up the new target consistently.
 
 If a command fails because Maven cannot access Maven Central, rerun with the appropriate network permission in the current tool environment.
 
@@ -82,7 +84,7 @@ Current expectations:
 
 - Unit tests compile.
 - Maven reactor builds.
-- Java release is 21.
+- Java release is 21 (Pleiades-bundled Adoptium Temurin; see JDK Pin above).
 - Spring Boot and Spring Batch dependencies resolve.
 - Package names are valid for Spring Batch 6 APIs.
 

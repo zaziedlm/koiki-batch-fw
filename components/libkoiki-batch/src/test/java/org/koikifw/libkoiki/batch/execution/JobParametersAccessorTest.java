@@ -35,4 +35,36 @@ class JobParametersAccessorTest {
         assertThatThrownBy(() -> new JobParametersAccessor(params).bizDate())
                 .isInstanceOf(IllegalStateException.class);
     }
+
+    @Test
+    void failsOnImpossibleCalendarBizDate() {
+        JobParameters params = new JobParametersBuilder()
+                .addString(StandardJobParameters.BIZ_DATE, "20260230")
+                .toJobParameters();
+
+        assertThatThrownBy(() -> new JobParametersAccessor(params).bizDate())
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(StandardJobParameters.BIZ_DATE);
+    }
+
+    @Test
+    void failsWhenBizDateMissing() {
+        JobParameters params = new JobParametersBuilder()
+                .addString(StandardJobParameters.JOB_NAME, "customer-daily-sync")
+                .addString(StandardJobParameters.REQUEST_ID, "req-001")
+                .toJobParameters();
+
+        assertThatThrownBy(() -> new JobParametersAccessor(params).bizDate())
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(StandardJobParameters.BIZ_DATE);
+    }
+
+    @Test
+    void returnsNullForUnsetJobNameAndRequestId() {
+        JobParameters params = new JobParametersBuilder().toJobParameters();
+        JobParametersAccessor accessor = new JobParametersAccessor(params);
+
+        assertThat(accessor.jobName()).isNull();
+        assertThat(accessor.requestId()).isNull();
+    }
 }

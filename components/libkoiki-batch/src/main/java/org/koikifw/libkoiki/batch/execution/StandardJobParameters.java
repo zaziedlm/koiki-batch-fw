@@ -1,6 +1,7 @@
 package org.koikifw.libkoiki.batch.execution;
 
 import java.time.format.DateTimeFormatter;
+import java.time.format.ResolverStyle;
 
 /**
  * Standard job parameter keys for KOIKI batch jobs.
@@ -15,8 +16,14 @@ public final class StandardJobParameters {
 
     public static final String REQUEST_ID = "job.requestId";
 
-    /** Business date is exchanged as a {@code yyyyMMdd} string. */
-    public static final DateTimeFormatter BIZ_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
+    /**
+     * Business date is exchanged as a {@code yyyyMMdd} string. The formatter
+     * uses {@code uuuu} (proleptic year) with {@link ResolverStyle#STRICT} so
+     * that impossible calendar dates (e.g. {@code 20260230}) are rejected
+     * instead of being silently rolled into a neighbouring valid date.
+     */
+    public static final DateTimeFormatter BIZ_DATE_FORMAT =
+            DateTimeFormatter.ofPattern("uuuuMMdd").withResolverStyle(ResolverStyle.STRICT);
 
     private StandardJobParameters() {
     }
