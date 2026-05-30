@@ -1,5 +1,8 @@
 package org.koikifw.libkoiki.batch.core;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -16,6 +19,8 @@ public class KoikiBatchProperties {
 
     private final Audit audit = new Audit();
 
+    private final Security security = new Security();
+
     public ConcurrencyGuard getConcurrencyGuard() {
         return concurrencyGuard;
     }
@@ -30,6 +35,10 @@ public class KoikiBatchProperties {
 
     public Audit getAudit() {
         return audit;
+    }
+
+    public Security getSecurity() {
+        return security;
     }
 
     /** Concurrency guard against multiple running executions of the same job. */
@@ -71,6 +80,50 @@ public class KoikiBatchProperties {
 
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
+        }
+    }
+
+    /** Security support: masking of sensitive data in logs and audit records. */
+    public static class Security {
+
+        private final Masking masking = new Masking();
+
+        public Masking getMasking() {
+            return masking;
+        }
+
+        /** Value masking applied to audit attributes (and offered to app logs). */
+        public static class Masking {
+
+            private boolean enabled = true;
+
+            private String mask = "***";
+
+            private Set<String> sensitiveKeys = new LinkedHashSet<>();
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
+
+            public String getMask() {
+                return mask;
+            }
+
+            public void setMask(String mask) {
+                this.mask = mask;
+            }
+
+            public Set<String> getSensitiveKeys() {
+                return sensitiveKeys;
+            }
+
+            public void setSensitiveKeys(Set<String> sensitiveKeys) {
+                this.sensitiveKeys = sensitiveKeys;
+            }
         }
     }
 

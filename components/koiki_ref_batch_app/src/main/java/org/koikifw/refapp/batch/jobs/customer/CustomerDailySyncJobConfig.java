@@ -32,6 +32,9 @@ public class CustomerDailySyncJobConfig {
 
     public static final String JOB_NAME = "customer-daily-sync";
 
+    /** Audit attribute key whose value is sensitive and must be masked. */
+    public static final String SENSITIVE_ACCOUNT_ATTRIBUTE = "accountId";
+
     @Bean
     public Tasklet customerDailySyncTasklet(AuditEventPublisher auditEventPublisher) {
         return (contribution, chunkContext) -> {
@@ -44,6 +47,10 @@ public class CustomerDailySyncJobConfig {
                     .eventType("CUSTOMER_DAILY_SYNC_COMPLETED")
                     .message("customer-daily-sync completed")
                     .context(jobExecution)
+                    .attribute("customerCount", "1")
+                    // Sensitive value: masked in audit output via
+                    // koiki.batch.security.masking.sensitive-keys (see application.yml).
+                    .attribute(SENSITIVE_ACCOUNT_ATTRIBUTE, "ACC-0001-DEMO")
                     .build());
 
             return RepeatStatus.FINISHED;

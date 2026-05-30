@@ -5,6 +5,15 @@ spring:
     job:
       name: customer-daily-sync
 
+koiki:
+  batch:
+    security:
+      masking:
+        # Audit attribute keys whose values must be masked before they reach the
+        # audit log. The customer-daily-sync tasklet emits "accountId" as a demo.
+        sensitive-keys:
+          - accountId
+
 logging:
   level:
     "[org.koikifw]": INFO

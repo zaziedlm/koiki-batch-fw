@@ -5,7 +5,29 @@
   <dependencies>
     <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-batch</artifactId></dependency>
     <dependency><groupId>org.springframework.batch</groupId><artifactId>spring-batch-core</artifactId></dependency>
+    <!-- Logback is optional: only MaskingPatternConverter needs it; apps using a
+         different logging backend (e.g. log4j2) are not forced onto Logback. -->
+    <dependency><groupId>ch.qos.logback</groupId><artifactId>logback-classic</artifactId><optional>true</optional></dependency>
     <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-test</artifactId><scope>test</scope></dependency>
     <dependency><groupId>org.springframework.batch</groupId><artifactId>spring-batch-test</artifactId><scope>test</scope></dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <!-- Run spring-boot-configuration-processor as an explicit annotation processor
+           (not via the classpath) to generate META-INF/spring-configuration-metadata.json
+           for koiki.batch.* without leaking the processor onto the test/runtime classpath. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.springframework.boot</groupId>
+              <artifactId>spring-boot-configuration-processor</artifactId>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
