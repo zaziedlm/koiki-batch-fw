@@ -4,12 +4,12 @@
 | --- | --- |
 | 対象バージョン | `v0.1.0` |
 | 対象パッケージ | `org.koikifw.libkoiki.batch.execution` |
-| ステータス | Draft |
+| ステータス | Done（`v0.1.0` 初期スコープを実装済み） |
 | 関連 | [ロードマップ](00-libkoiki-batch-roadmap.md) / [タスク](../tasks/20-execution.md) / [architecture-batch.md](../batch/architecture-batch.md) / [rerun-procedure.md](../../ops/jp1/runbook/rerun-procedure.md) |
 
 ## 狙い
 
-ジョブ実行制御の共通部品。標準ジョブパラメータ契約の確立、パラメータ検証、型付きアクセス、同時実行ガードの実体化。現状 [ConcurrencyGuardService.java](../../components/libkoiki-batch/src/main/java/org/koikifw/libkoiki/batch/execution/ConcurrencyGuardService.java) は `acquire()` が常に `true` を返すスタブ。
+ジョブ実行制御の共通部品。標準ジョブパラメータ契約の確立、パラメータ検証、型付きアクセス、同時実行ガードの実体化を担う。現在は `KoikiJobParametersValidator`、`JobParametersAccessor`、`JobRepositoryConcurrencyGuardService`、`ConcurrencyGuardJobListener` を実装済みである。
 
 標準パラメータ（[architecture-batch.md](../batch/architecture-batch.md) §3）:
 - `job.name` … ジョブ名

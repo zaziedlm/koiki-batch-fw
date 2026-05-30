@@ -4,7 +4,7 @@
 | --- | --- |
 | 対象バージョン | `v0.1.0` |
 | 対象パッケージ | `org.koikifw.libkoiki.batch.fault` |
-| ステータス | Draft |
+| ステータス | Done（`v0.1.0` 初期スコープを実装済み。スケジューラ経路の詳細は deferred） |
 | 関連 | [ロードマップ](00-libkoiki-batch-roadmap.md) / [タスク](../tasks/30-fault.md) / [return-code-mapping.md](../../ops/jp1/jobs/return-code-mapping.md) / [architecture-batch.md](../batch/architecture-batch.md) |
 
 ## 狙い

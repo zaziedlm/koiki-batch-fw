@@ -4,7 +4,7 @@
 | --- | --- |
 | 対象バージョン | `v0.1.0` |
 | 対象パッケージ | `org.koikifw.libkoiki.batch.transaction` / `org.koikifw.libkoiki.batch.validation` |
-| ステータス | Draft |
+| ステータス | Done（`v0.1.0` 初期スコープを実装済み。本番DB方言等は deferred） |
 | 関連 | [ロードマップ](00-libkoiki-batch-roadmap.md) / [タスク](../tasks/70-transaction-validation.md) / [DB管理アーキテクチャ](../batch/db-management-architecture.md) / [decision-log](../batch/decision-log.md) |
 
 ## 狙い

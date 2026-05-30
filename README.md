@@ -10,9 +10,9 @@ Current development line: `v0.1.0`
 
 Maven version: `0.1.0-SNAPSHOT`
 
-現時点では、バッチ基盤としての最小構造、Maven マルチモジュール、依存関係のベースライン、責務分離のパッケージ構成、運用ドキュメントの入口までを整備しています。
+現時点では、バッチ基盤としての最小構造、Maven マルチモジュール、依存関係のベースライン、責務分離のパッケージ構成、運用ドキュメントの入口、主要な共通機能の初期実装までを整備しています。
 
-実ジョブ、Reader / Processor / Writer、監査永続化、標準トランザクションポリシー、障害分類の実装は今後拡張する前提です。ただし、それらを配置するパッケージと設計上の責務は先に定義済みです。
+参照アプリには、tasklet、DB-backed chunk、file-to-file chunk の実ジョブがあります。監査永続化、分散ロック、本番DB方言、PII クラス別マスキングなどは今後の deferred 項目です。
 
 ## Technology Baseline
 
@@ -157,6 +157,14 @@ macOS / Linux では以下で確認できます。
 ./mvnw clean test
 ```
 
+`mvn clean test` は Surefire による単体テスト確認です。`*IT` の integration test は Failsafe により `mvn verify` で実行します。
+
+参照アプリ統合、起動経路、終了コード、DB-backed job、I/O lifecycle、モジュール間のパッケージ/依存境界に触れる変更では、完了確認として以下を実行してください。
+
+```powershell
+.\mvnw.cmd verify
+```
+
 VS Code Extension Pack for Java Auto Config を使っていて `java` が PATH にない場合は、JDK だけ `JAVA_HOME` に設定してください。
 
 ```powershell
@@ -164,7 +172,7 @@ $env:JAVA_HOME="$env:APPDATA\Code\User\globalStorage\pleiades.java-extension-pac
 .\mvnw.cmd clean test
 ```
 
-現在の構成では、全モジュールの `.\mvnw.cmd clean test` が成功することを確認しています。
+現在の構成では、全モジュールの `mvn verify` で単体テストと integration test を確認します。
 
 ## Documentation
 
@@ -182,14 +190,11 @@ $env:JAVA_HOME="$env:APPDATA\Code\User\globalStorage\pleiades.java-extension-pac
 
 以下は今後の実装・整理対象です。
 
-- 実際の Spring Batch Job / Step 実装
-- Reader / Processor / Writer の参照実装
-- 標準的な exit code catalog
-- 構造化ログの出力形式
-- audit event publisher
-- transaction policy helper
-- fault classifier
-- validation contracts
+- 分散/DB ロックを含む同時実行制御の拡張
+- 監査イベントの永続化方式
+- PII クラス別の標準マスキングルール
+- 本番DB方言（Oracle/PostgreSQL 等）での検証
+- ファイル取込の詳細な運用モデル、世代管理、リジェクトファイル方針
 - `customer_b_batch_app` など追加顧客アプリ
 - `tests/integration` / `tests/e2e`
 - OWASP Dependency-Check などの SCA 実行を CI に組み込むこと

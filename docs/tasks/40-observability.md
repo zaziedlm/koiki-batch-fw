@@ -5,7 +5,7 @@
 | 対象パッケージ | `org.koikifw.libkoiki.batch.observability` |
 | 計画 | [40-observability.md](../plans/40-observability.md) |
 | 検証コマンド | `.\mvnw.cmd clean verify`（IT 込み） |
-| ステータス | Not started |
+| ステータス | Done（MDC 相関、Job/Step listener、参照アプリ IT 通過） |
 
 共通の準拠事項は [ロードマップの準拠仕様](../plans/00-libkoiki-batch-roadmap.md) に従う。非推奨 API（`JobExplorer` / `JobLauncher` / `CommandLineJobRunner`）は使わない。MDC は SLF4J 標準 `org.slf4j.MDC`、リスナーは `org.springframework.batch.core.listener`。
 

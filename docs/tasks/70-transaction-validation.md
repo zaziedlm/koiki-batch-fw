@@ -5,7 +5,7 @@
 | 対象パッケージ | `org.koikifw.libkoiki.batch.transaction` / `.../validation` |
 | 計画 | [70-transaction-validation.md](../plans/70-transaction-validation.md) |
 | 検証コマンド | `.\mvnw.cmd clean verify`（IT 込み・H2） |
-| ステータス | Not started |
+| ステータス | Done（validation 契約、commit interval、DB-backed 参照ジョブ、H2 IT 通過） |
 
 共通の準拠事項は [ロードマップの準拠仕様](../plans/00-libkoiki-batch-roadmap.md) と [DB管理アーキテクチャ](../batch/db-management-architecture.md) に従う。非推奨 API 不使用、Spring 標準イディオム。Boot に DataSource を渡し JDBC JobRepository を**自動構成**させる（`@EnableBatchProcessing` 手書き禁止）。`BATCH_*` DDL は SB 同梱 `schema-h2.sql` を逐語コピー（推測禁止）。
 

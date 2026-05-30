@@ -36,11 +36,13 @@ Reference application code belongs under:
 org.koikifw.refapp.batch.*
 ```
 
-Customer-specific code should use the customer's own application package, such as:
+Repository-owned customer sample apps should use:
 
 ```text
-com.customer.a.batch.*
+org.koikifw.customer.<customer-id>.batch.*
 ```
+
+Real downstream customer apps outside this repository may use customer-owned roots when that decision is explicit.
 
 Do not introduce a new package root without updating the relevant documentation and explaining the reason.
 
@@ -111,6 +113,10 @@ The default verification command is:
 ```
 
 On macOS / Linux, use `./mvnw clean test`.
+
+`mvn clean test` runs Surefire unit tests. Integration tests named `*IT` run under Failsafe during `mvn verify`.
+
+Use `mvn verify` before completing changes that affect reference-app integration, Failsafe, launch behavior, exit codes, DB-backed jobs, I/O lifecycle, or package/dependency boundaries across modules.
 
 When using the VS Code Java Extension Pack managed JDK on Windows, `JAVA_HOME` may still need to be set as documented in `README.md`.
 

@@ -4,12 +4,12 @@
 | --- | --- |
 | 対象バージョン | `v0.1.0` |
 | 対象パッケージ | `org.koikifw.libkoiki.batch.observability` |
-| ステータス | Draft |
+| ステータス | Done（`v0.1.0` 初期スコープを実装済み） |
 | 関連 | [ロードマップ](00-libkoiki-batch-roadmap.md) / [タスク](../tasks/40-observability.md) / [platform-capabilities](../batch/platform-capabilities.md) / [decision-log](../batch/decision-log.md) |
 
 ## 狙い
 
-運用診断のための **MDC 相関コンテキスト** と **Job/Step ライフサイクルの構造化ログ**をフレームワークとして提供する。現状 [JobLogListener.java](../../components/libkoiki-batch/src/main/java/org/koikifw/libkoiki/batch/observability/JobLogListener.java) は `beforeJob`/`afterJob` が空のスタブ。
+運用診断のための **MDC 相関コンテキスト** と **Job/Step ライフサイクルの構造化ログ**をフレームワークとして提供する。現在は `JobLogListener` と `StepLogListener` が MDC 相関キーを設定/解除し、参照アプリの integration test で確認済みである。
 
 ### 出力したい相関項目（[platform-capabilities](../batch/platform-capabilities.md) §Enterprise Concerns / Logging 準拠）
 - ジョブ名 / ジョブ実行 ID / 営業日 / リクエスト ID / テナント（任意）

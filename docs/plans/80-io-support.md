@@ -4,12 +4,12 @@
 | --- | --- |
 | 対象バージョン | `v0.1.0` |
 | 対象パッケージ | `org.koikifw.libkoiki.batch.io` / `org.koikifw.libkoiki.batch.support` |
-| ステータス | Draft |
+| ステータス | Done（`v0.1.0` 初期スコープを実装済み。追加運用モデルは deferred） |
 | 関連 | [ロードマップ](00-libkoiki-batch-roadmap.md) / [タスク](../tasks/80-io-support.md) / [DB管理アーキテクチャ](../batch/db-management-architecture.md) / [decision-log](../batch/decision-log.md) |
 
 ## 狙い
 
-**標準 Spring Batch の reader/writer はそのまま使う**前提で、その上にバッチ基盤が**汎用的に**足せる IO 付加価値を整備する。個社固有のファイルレイアウト（固定長の多レコード種別・ヘッダ/トレーラ照合等）は要求が見えていないため**今回は扱わない**。`io`/`support` は現状 package-info のみ（スタブ）。
+**標準 Spring Batch の reader/writer はそのまま使う**前提で、その上にバッチ基盤が**汎用的に**足せる IO 付加価値を整備する。個社固有のファイルレイアウト（固定長の多レコード種別・ヘッダ/トレーラ照合等）は要求が見えていないため**今回は扱わない**。現在は charset helper、取込ファイル lifecycle、archive/error policy、atomic output の初期実装と参照 file job の integration test を持つ。
 
 整備する付加価値（業務非依存・再利用可能、合意済み）:
 

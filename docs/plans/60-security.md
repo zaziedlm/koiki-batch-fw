@@ -4,12 +4,12 @@
 | --- | --- |
 | 対象バージョン | `v0.1.0` |
 | 対象パッケージ | `org.koikifw.libkoiki.batch.security` |
-| ステータス | Draft |
+| ステータス | Done（`v0.1.0` 初期スコープを実装済み） |
 | 関連 | [ロードマップ](00-libkoiki-batch-roadmap.md) / [タスク](../tasks/60-security.md) / [platform-capabilities](../batch/platform-capabilities.md) / [decision-log](../batch/decision-log.md) / [audit plan](50-audit.md) |
 
 ## 狙い
 
-**機密データ（PII・秘密情報）がログ・監査に素のまま漏れる事故を防ぐ**ための共通フックを提供する。現状 [package-info.java](../../components/libkoiki-batch/src/main/java/org/koikifw/libkoiki/batch/security/package-info.java) で責務が宣言されているのみで実体はない。
+**機密データ（PII・秘密情報）がログ・監査に素のまま漏れる事故を防ぐ**ための共通フックを提供する。現在は `Masker`、`RedactingMasker`、`MaskingPatternConverter` を実装済みで、audit attribute masking と Logback pattern masking のテストを持つ。
 
 本フェーズは「マスキングの**仕組み（IF とフック）**」を提供することに限定し、「どの値がどの PII クラスか」という**標準ルールのカタログ化は deferred**（[platform-capabilities](../batch/platform-capabilities.md) §Deferred Decisions「Standard masking rules for personal data classes」）。framework はマスキングの**境界と差し込み口**を持ち、具体的なルールはアプリが供給する。
 
