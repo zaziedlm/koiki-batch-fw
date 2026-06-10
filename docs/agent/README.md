@@ -40,12 +40,30 @@ The project currently has:
 - Java 21 baseline
 - Spring Boot 4.0.x baseline
 - Spring Batch 6.0.x baseline
-- Shared framework package map
-- Reference application skeleton
-- Customer application skeleton
+- Implemented Phase 0-5 initial framework scope covering core, execution, fault handling, observability, audit, security, transaction, validation, and I/O support
+- Three executable reference jobs:
+  - `customer-daily-sync`: tasklet reference job
+  - `customer-import`: DB-backed chunk reference job
+  - `billing-file`: file-to-file chunk reference job
+- Unit tests for framework contracts
+- Failsafe integration tests for framework wiring, launch and exit-code behavior, DB-backed processing, logging, audit, masking, and file I/O lifecycle
+- A repository-owned customer application skeleton under `apps/customer_a_batch_app`
 - JP1-oriented operation documentation
 
-The project does not yet have a complete production batch core implementation. Agents should treat logging, audit, transaction, fault handling, and validation as defined capability areas, not as fully implemented features.
+The `v0.1.0` initial framework scope is implemented and demonstrated through the reference application. It is not yet a complete production platform. Distributed locking, durable audit storage, production database dialect verification, standard PII-class masking rules, and the production JP1 launcher remain deferred.
+
+Customer applications should depend directly on `libkoiki-batch`. They should not inherit production job implementations from `koiki-ref-batch-app`.
+
+## Verification Summary
+
+Use the smallest verification that covers the change:
+
+- `mvn clean test`: Surefire unit tests for a quick local regression check
+- `mvn verify`: full verification including Failsafe `*IT` integration tests
+
+Use `mvn verify` before completing changes that affect reference jobs, application launch behavior, exit codes, DB/Flyway integration, file I/O lifecycle, or cross-module package and dependency boundaries.
+
+See `docs/agent/testing.md` for environment-specific commands and the detailed verification policy.
 
 ## Tool-Neutral Rules
 
@@ -55,18 +73,34 @@ Tool-specific instruction files can be added later, but they should point back t
 
 When a tool suggests a change that conflicts with this repository guidance, follow the repository guidance and document any exception.
 
-## When to Create Tool-Specific Skills
+## Skill Readiness
 
-Dedicated agent skills or tool-specific instructions are useful after implementation patterns are proven.
+The project now has enough working implementation patterns to introduce small, task-focused agent skills.
 
-Good triggers:
+Good skill candidates are workflows that:
 
-- A reference job has a real Job/Step/Reader/Processor/Writer implementation.
-- The same new-batch creation workflow has been repeated more than once.
-- Logging, audit, transaction, and fault-handling patterns have working minimal implementations.
-- Integration or e2e testing conventions exist.
+- Reuse the existing tasklet, DB chunk, or file chunk reference patterns
+- Preserve framework/reference/customer module boundaries
+- Apply established logging, audit, transaction, validation, fault-handling, and I/O conventions
+- Have clear unit or integration verification requirements
 
-Until then, keep guidance lightweight and shared.
+Keep skills lightweight and point them back to repository documents and working code. Do not duplicate the complete architecture or create tool-specific rules that can drift from `AGENTS.md`.
+
+## Shared Skills
+
+`docs/agent/skills` is the tool-neutral source of truth for repository-specific agent workflows.
+
+| Skill | Status | Purpose |
+| --- | --- | --- |
+| [`add-reference-batch-job`](skills/add-reference-batch-job/SKILL.md) | Usable | Add or extend a reference job under `components/koiki_ref_batch_app`, using a lightweight requirement gate before selecting or combining the existing tasklet, DB chunk, or file chunk patterns. |
+| [`koiki-batch-overview`](skills/koiki-batch-overview/SKILL.md) | Seed | Future project overview and module-planning workflow. The current one-line file is not yet an operational skill. |
+| [`koiki-batch-ops-jp1`](skills/koiki-batch-ops-jp1/SKILL.md) | Seed | Future JP1 operation workflow. The current one-line file is not yet an operational skill. |
+
+Use `add-reference-batch-job` only for reference application jobs. Customer-specific jobs belong under `apps/*`, common framework capability design belongs under `components/libkoiki-batch`, and JP1 launcher work belongs under `ops/jp1`.
+
+The requirement gate distinguishes `実装開始`, `暫定試行`, and `設計確認`. It should prevent assumptions about data integrity, restart, security, audit, and operations from silently becoming specifications, without forcing a full requirements questionnaire for every small change. Existing patterns may be combined, but an unverified combination such as file-to-DB must not be described as an implemented reference pattern.
+
+These shared files are repository documentation, not automatic installation or discovery configuration for every AI tool. Codex, Claude Code, Kiro, and GitHub Copilot use different discovery mechanisms. Tool-specific adapters may point to these files later, but should not duplicate their rules.
 
 ## Documentation Maintenance
 
@@ -75,6 +109,7 @@ Update these files when project rules change:
 - Root `AGENTS.md`: repository-wide rules
 - `docs/agent/boundaries.md`: ownership and placement boundaries
 - `docs/agent/testing.md`: verification rules
+- `docs/agent/skills/*`: repeatable repository-specific workflows
 - `docs/batch/decision-log.md`: durable decisions and rationale
 - `docs/batch/platform-capabilities.md`: batch framework capability map
 
