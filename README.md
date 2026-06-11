@@ -109,6 +109,23 @@ $cp = @(
 $LASTEXITCODE
 ```
 
+macOS / Linux では classpath の区切りに `:` を使用します。
+
+```bash
+./mvnw -pl components/koiki_ref_batch_app -am package dependency:copy-dependencies -DskipTests
+
+CP="components/koiki_ref_batch_app/target/classes:components/libkoiki-batch/target/classes:components/koiki_ref_batch_app/target/dependency/*"
+
+java -cp "$CP" \
+  org.koikifw.refapp.batch.KoikiRefBatchApplication \
+  --spring.batch.job.name=customer-daily-sync \
+  job.name=customer-daily-sync \
+  job.bizDate=20260531 \
+  job.requestId=manual-20260531-001
+
+echo $?
+```
+
 `job.bizDate` は `yyyyMMdd` 形式、`job.requestId` は起動ごとに一意な値を指定します。
 
 ### `apps/*`
@@ -200,6 +217,17 @@ macOS / Linux では以下で確認できます。
 ```bash
 ./mvnw clean test
 ```
+
+macOS で Extension Pack for Java Auto Config が管理する JDK 21 を使う場合は、以下を設定します。
+
+```bash
+export JAVA_HOME="$HOME/Library/Application Support/Code/User/globalStorage/pleiades.java-extension-pack-jdk/java/21"
+export PATH="$JAVA_HOME/bin:$PATH"
+java -version
+./mvnw clean test
+```
+
+Extension Pack を使わない場合は、Adoptium Temurin 21 などの Java 21 JDK を導入し、そのインストール先を `JAVA_HOME` に設定してください。
 
 `mvn clean test` は Surefire による単体テスト確認です。`*IT` の integration test は Failsafe により `mvn verify` で実行します。
 
