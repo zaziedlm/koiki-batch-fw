@@ -49,6 +49,16 @@ $env:JAVA_HOME="$env:APPDATA\Code\User\globalStorage\pleiades.java-extension-pac
 .\mvnw.cmd clean verify
 ```
 
+On macOS, the same VS Code extension stores its managed JDKs under the VS Code user `globalStorage` directory. Select `java/21` explicitly because the extension can install multiple JDK versions:
+
+```bash
+export JAVA_HOME="$HOME/Library/Application Support/Code/User/globalStorage/pleiades.java-extension-pack-jdk/java/21"
+export PATH="$JAVA_HOME/bin:$PATH"
+./mvnw clean verify
+```
+
+Developers not using the extension may use another Java 21 distribution, such as a standalone Adoptium Temurin 21 installation.
+
 Maven Wrapper is checked in, so no local Maven installation is required.
 
 When this pin is changed (e.g. moving to a standalone Adoptium install or adopting Java 25 LTS), update this section *and* the `decision-log` so downstream environments and agents pick up the new target consistently.

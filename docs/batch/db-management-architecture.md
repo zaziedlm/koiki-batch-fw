@@ -17,9 +17,10 @@ The earlier decision "the framework does not provide a fallback `PlatformTransac
 scope. Business RDBMS access, connections, chunk management, and transaction management are
 **core batch capabilities** and must be designed with clear responsibility separation.
 
-The project is currently DB-less end to end (no `DataSource`, no JDBC driver, no Flyway;
-the reference app declares a `ResourcelessTransactionManager`). This document describes the
-DB-backed model the framework moves toward.
+The reference app now demonstrates DB-backed chunk processing with H2, Flyway-managed
+business and batch-metadata schemas, and both resourceless and JDBC `JobRepository` modes.
+The framework still keeps `DataSource`, transaction-manager, repository-mode, and
+production-database choices in the application boundary.
 
 ## Two independent concerns
 
@@ -29,7 +30,7 @@ design.
 | # | Concern | What it stores | Owner |
 | --- | --- | --- | --- |
 | 1 | **Batch metadata** (`JobRepository`) | Job / step execution state — the basis for **restart / rerun** | Framework auto-config + app `DataSource` wiring |
-| 2 | **Business data processing** | Domain input/output via chunk read / process / write | Application (DAO/SQL); reader/writer **contracts** are framework `io` (Phase 5) |
+| 2 | **Business data processing** | Domain input/output via chunk read / process / write | Application (DAO/SQL and stock Spring Batch readers/writers); framework `io` provides shared lifecycle and charset support |
 
 A third cross-cutting concern, **transaction management**, binds them together (see below),
 and a fourth, **schema management**, provisions both sets of tables (see Schema management).
@@ -212,7 +213,7 @@ Production database dialects and their locking/behavioral differences are otherw
 | Batch infra auto-config integration | `org.koikifw.libkoiki.batch.core` (adds to Boot, never redefines) |
 | Commit boundary / transaction policy | `org.koikifw.libkoiki.batch.transaction` (properties + guidance; **no TM bean**) |
 | Restart / rerun / concurrency guard | `org.koikifw.libkoiki.batch.execution` |
-| Reader / writer contracts | `org.koikifw.libkoiki.batch.io` (**Phase 5**; jobs use stock Spring Batch readers/writers until then) |
+| Shared I/O lifecycle and charset support | `org.koikifw.libkoiki.batch.io` (jobs continue to own stock Spring Batch reader/writer configuration) |
 | Fault → exit code mapping | `org.koikifw.libkoiki.batch.fault` |
 | `DataSource`, transaction manager bean, business DAO/SQL, Flyway migrations | **Application** (reference app / `apps/*`) |
 
@@ -231,4 +232,5 @@ Production database dialects and their locking/behavioral differences are otherw
   (`@BatchDataSource` topology).
 - Production database dialects (Oracle / PostgreSQL) and locking differences; tests use H2,
   dialect differences are app-level guidance.
-- Framework reader/writer (`io`) adapter contracts — Phase 5.
+- Additional reusable reader/writer adapters beyond the current file lifecycle, atomic-output,
+  and charset support. Add them only after reference jobs establish a reusable requirement.

@@ -12,7 +12,7 @@
 | # | 関心事 | 保存対象 | 担い手 |
 | --- | --- | --- | --- |
 | 1 | **バッチ・メタデータ**（JobRepository） | ジョブ/ステップ実行状態＝**リスタート/履歴**の土台 | フレームワーク自動構成 + アプリの `DataSource` 配線 |
-| 2 | **業務データ処理** | chunk の read/process/write による業務データ | アプリ（DAO/SQL）。reader/writer 契約は `io`＝Phase 5 |
+| 2 | **業務データ処理** | chunk の read/process/write による業務データ | アプリ（DAO/SQL と Spring Batch 標準 reader/writer）。共通の lifecycle・文字コード支援は `io` |
 
 横断で **③トランザクション管理**（両者を束ねる）と **④スキーマ管理**（両テーブル群の作成）があります。
 
@@ -142,6 +142,8 @@ class BatchJobRepositoryConfig {}
 | バッチ基盤の自動構成統合 | `org.koikifw.libkoiki.batch.core`（Bootに追加・再定義しない） |
 | コミット境界/トランザクション方針 | `org.koikifw.libkoiki.batch.transaction`（プロパティ+ガイド・**TM bean なし**） |
 | リスタート/リラン/同時実行ガード | `org.koikifw.libkoiki.batch.execution` |
-| reader/writer 契約 | `org.koikifw.libkoiki.batch.io`（**Phase 5**。当面は標準SB reader/writer） |
+| 共通 I/O lifecycle・文字コード支援 | `org.koikifw.libkoiki.batch.io`（reader/writer 構成は引き続きアプリが標準SB部品で所有） |
 | 障害→終了コード変換 | `org.koikifw.libkoiki.batch.fault` |
 | `DataSource`・TM bean・業務DAO/SQL・Flyway移行 | **アプリ**（参照アプリ / `apps/*`） |
+
+追加の汎用 reader/writer adapter は、参照ジョブで再利用要件が確認された時点で検討します。現在実装済みの file lifecycle、atomic output、文字コード支援と区別してください。

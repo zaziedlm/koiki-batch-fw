@@ -1,6 +1,6 @@
 # Batch Platform Capabilities
 
-This document records the target capability map for KOIKI Batch Framework. It is intentionally lightweight: the goal is to keep responsibility boundaries clear before heavy implementation begins.
+This document records the capability map for KOIKI Batch Framework. The `v0.1.0` initial scope is implemented, while production hardening and capabilities listed under Deferred Decisions remain future work. The map stays intentionally lightweight so current responsibilities and future extension points remain distinct.
 
 ## Current Baseline
 
@@ -17,12 +17,12 @@ This document records the target capability map for KOIKI Batch Framework. It is
 
 ## Capability Map
 
-| Area | Package | Purpose | Initial Scope |
+| Area | Package | Purpose | v0.1.0 Initial Scope |
 | --- | --- | --- | --- |
 | Core configuration | `org.koikifw.libkoiki.batch.core` | Framework auto-configuration and defaults | Auto-configuration entry point |
 | Execution control | `org.koikifw.libkoiki.batch.execution` | Job execution policy, concurrency, rerun/restart guardrails | Concurrency guard service |
 | Fault handling | `org.koikifw.libkoiki.batch.fault` | Exception classification, retry/skip, exit code mapping | Policy definitions and common classifiers |
-| I/O support | `org.koikifw.libkoiki.batch.io` | Common readers/writers and adapter contracts | DB/file/external interface extension points |
+| I/O support | `org.koikifw.libkoiki.batch.io` | Shared I/O lifecycle and adapter support | File ingestion lifecycle, atomic output, charset resolution; job-specific reader/writer configuration remains in applications |
 | Observability | `org.koikifw.libkoiki.batch.observability` | Structured logging, lifecycle logging, metrics | Job listener and log context |
 | Audit | `org.koikifw.libkoiki.batch.audit` | Audit trail events and publication boundary | Audit event model and publisher interface |
 | Security | `org.koikifw.libkoiki.batch.security` | Secret handling, masking, credential boundary | Masking and policy hooks |

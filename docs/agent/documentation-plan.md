@@ -6,7 +6,9 @@ This plan records the current documentation task for making KOIKI Batch Framewor
 
 Prepare lightweight, tool-neutral guidance that can be read by Codex, Claude Code, Kiro, GitHub Copilot, and human developers.
 
-At this stage, the project should not depend on heavily specialized agent skills. The batch core is still early, so the documentation should define stable boundaries, verification commands, and placement rules without over-prescribing implementation details that are not proven by code yet.
+At the time of this initial documentation plan, the project did not depend on specialized agent skills. The first priority was to establish stable boundaries, verification commands, and placement rules without prescribing implementation details that had not yet been proven by code.
+
+The Phase 0-5 initial scope and three reference-job patterns are now implemented. Follow-up work is tracked in `docs/plans/95-agent-readiness-reference-job-skill.md`, beginning with the lightweight `add-reference-batch-job` shared skill.
 
 ## Scope
 
@@ -36,11 +38,13 @@ Create and update:
 - Testing guidance documents the current standard command and the future direction for integration/e2e tests.
 - The documents avoid premature heavy implementation rules for areas that are still design-stage.
 
-## Deferred
+## Follow-up Status
 
-Dedicated tool-specific files can be added later when the implementation patterns are proven:
+Repository-specific shared skills may now be added under `docs/agent/skills` when backed by working code and tests. Tool-specific discovery adapters remain deferred:
 
-- Codex skill
 - Claude Code `CLAUDE.md`
 - Kiro steering/spec documents
 - GitHub Copilot `.github/copilot-instructions.md`
+- Codex installation or discovery adapter
+
+These adapters should reference the shared repository guidance instead of copying complete rules into each tool-specific file.
