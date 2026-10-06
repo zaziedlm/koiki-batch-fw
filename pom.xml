@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.0.6</version>
+    <version>4.1.1</version>
     <relativePath/>
   </parent>
   <groupId>org.koikifw</groupId>
@@ -18,7 +18,49 @@
   <properties>
     <java.version>21</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- Keep related artifacts aligned through Spring Boot's BOM properties.
+         Overrides track stable releases newer than the Boot 4.1.1 defaults;
+         see docs/batch/oss-dependency-upgrade.md for compatibility verification. -->
+    <byte-buddy.version>1.18.14</byte-buddy.version>
+    <commons-logging.version>1.4.0</commons-logging.version>
+    <flyway.version>13.9.0</flyway.version>
+    <h2.version>2.5.252</h2.version>
+    <hikaricp.version>7.1.0</hikaricp.version>
+    <jackson-2-bom.version>2.22.3</jackson-2-bom.version>
+    <json-path.version>3.0.0</json-path.version>
+    <junit-jupiter.version>6.1.3</junit-jupiter.version>
+    <log4j2.version>2.26.1</log4j2.version>
+    <logback.version>1.6.5</logback.version>
+    <mockito.version>5.24.0</mockito.version>
+    <objenesis.version>3.6</objenesis.version>
+    <slf4j.version>2.0.20</slf4j.version>
+    <snakeyaml.version>2.7</snakeyaml.version>
+    <xmlunit2.version>2.14.0</xmlunit2.version>
+    <asm.version>9.10.1</asm.version>
+    <maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
+    <maven-dependency-plugin.version>3.11.0</maven-dependency-plugin.version>
+    <maven-deploy-plugin.version>3.2.0</maven-deploy-plugin.version>
+    <maven-failsafe-plugin.version>3.6.0</maven-failsafe-plugin.version>
+    <maven-install-plugin.version>3.2.0</maven-install-plugin.version>
+    <maven-surefire-plugin.version>3.6.0</maven-surefire-plugin.version>
   </properties>
+  <dependencyManagement>
+    <dependencies>
+      <!-- Transitive test dependencies are not managed by the Boot BOM.
+           Keep Mockito's instantiation support and JSON Smart's bytecode
+           generation on the stable versions verified with this reactor. -->
+      <dependency>
+        <groupId>org.objenesis</groupId>
+        <artifactId>objenesis</artifactId>
+        <version>${objenesis.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.ow2.asm</groupId>
+        <artifactId>asm</artifactId>
+        <version>${asm.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <build>
     <plugins>
       <!-- Resolves dependency jar paths into properties, e.g. ${org.mockito:mockito-core:jar},

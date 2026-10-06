@@ -2,7 +2,7 @@
 
 本書は [db-management-architecture.md](db-management-architecture.md)（英語・正典）の**日本語コンパニオン**です。業務・運用チームが「運用要件に応じたバッチDB設定」を判断するための要点を日本語で確認できるようにしたものです。設計判断の最終正典は [decision-log.md](decision-log.md)。内容は英語版と同期させて更新します。
 
-対象: Spring Batch 6.0.x / Spring Boot 4.0.x。`v0.1.0` の合意ベースライン。
+対象: Spring Batch 6.0.x / Spring Boot 4.1.x。`v0.1.0` の合意ベースライン。本文の初期検証は Boot 4.0.6 / SB 6.0.3 に基づき、[OSS 更新](oss-dependency-upgrade.md)で Boot 4.1.1 / SB 6.0.5 上の統合テストを再検証した。
 
 ## 0. 最初に押さえる前提
 

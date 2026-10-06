@@ -19,12 +19,14 @@ Maven version: `0.1.0-SNAPSHOT`
 ## Technology Baseline
 
 - Java 21
-- Maven multi-module project
-- Spring Boot 4.0.x
-- Spring Batch 6.0.x
+- Maven 3.10.0 (Wrapper) multi-module project
+- Spring Boot 4.1.1
+- Spring Batch 6.0.5
 - Official package root: `org.koikifw.*`
 
 `koikifw.org` ドメインを正式ドメインとし、Java パッケージは `org.koikifw.*` を標準とします。
+
+OSS の更新対象、BOM の上書き方針と互換性の検証結果は [OSS dependency upgrade](docs/batch/oss-dependency-upgrade.md) を参照してください。
 
 ## Module Structure
 

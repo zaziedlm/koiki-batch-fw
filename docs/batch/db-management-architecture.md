@@ -5,7 +5,7 @@ in KOIKI Batch Framework: how batch metadata, business data, transactions, and s
 are owned and wired. It is the reference for Phase 4 (transaction / validation) and for
 any DB-backed job in the framework, reference app, and customer apps.
 
-Status: agreed baseline for `v0.1.0`. Grounded in Spring Batch 6.0.x and Spring Boot 4.0.x.
+Status: agreed baseline for `v0.1.0`. Originally grounded in Spring Batch 6.0.x and Spring Boot 4.0.x; revalidated on Spring Batch 6.0.5 / Spring Boot 4.1.1 in the [OSS dependency upgrade](oss-dependency-upgrade.md).
 
 > Japanese companion for business/operations teams: [db-management-architecture.ja.md](db-management-architecture.ja.md). Keep the two in sync.
 

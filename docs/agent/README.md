@@ -38,7 +38,7 @@ The project currently has:
 
 - A Maven multi-module structure
 - Java 21 baseline
-- Spring Boot 4.0.x baseline
+- Spring Boot 4.1.x baseline
 - Spring Batch 6.0.x baseline
 - Implemented Phase 0-5 initial framework scope covering core, execution, fault handling, observability, audit, security, transaction, validation, and I/O support
 - Three executable reference jobs:
