@@ -7,8 +7,9 @@ This document records the capability map for KOIKI Batch Framework. The `v0.1.0`
 - Development line: `v0.1.0`
 - Maven version: `0.1.0-SNAPSHOT`
 - Java 21
-- Spring Boot 4.0.x
-- Spring Batch 6.0.x
+- Spring Boot 4.1.1
+- Spring Batch 6.0.5
+- Maven Wrapper 3.10.0
 - Multi-module Maven structure
 - Shared framework module: `components/libkoiki-batch`
 - Reference application module: `components/koiki_ref_batch_app`

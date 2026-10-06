@@ -1,5 +1,13 @@
 # Batch Decision Log
 
+## 2026-10-06: Stable OSS Dependency Upgrade
+
+Decision: move to Spring Boot 4.1.1 / Spring Batch 6.0.5 and Maven 3.10.0 while retaining Java 21. Use Boot BOM properties for newer stable library families and explicit dependency management for unmanaged transitive test dependencies (Objenesis and ASM).
+
+Reason: update the complete resolved dependency graph without splitting related library versions across modules. Prereleases are excluded. All 138 existing unit and integration tests and dependency-convergence checks passed in the dedicated worktree.
+
+Impact: Flyway, Logback, JSONPath and test/build libraries also move to newer stable lines. The [OSS dependency upgrade record](oss-dependency-upgrade.md) lists the versions, test coverage, the cloud JDK's missing `ct.sym` and resulting source/target-only verification, and the Flyway/H2 warning. Earlier entries retain the versions used for their original design verification.
+
 ## 2026-05-21: Development Version Baseline
 
 Decision: use `v0.1.0` as the current KOIKI Batch Framework development line.
